@@ -1,9 +1,6 @@
 package sd2223.trab1.api.server.resources;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import sd2223.trab1.api.api.Message;
@@ -15,13 +12,14 @@ import jakarta.ws.rs.core.Response.Status;
 import sd2223.trab1.api.api.rest.FeedsService;
 
 @Singleton
-public class UsersResource implements UsersService, FeedsService {
+public class AppResource implements UsersService, FeedsService {
 
 	private final Map<String,User> users = new HashMap<>();
-
-	private static Logger Log = Logger.getLogger(UsersResource.class.getName());
+	private final Map<String, Map<Long,Message>> feeds = new HashMap<>(); //perguntar ao prof qual e a melhor opcao: so String ou User
+	private final Map<String, List<User>> subs = new HashMap<>();
+	private static Logger Log = Logger.getLogger(AppResource.class.getName());
 	
-	public UsersResource() {
+	public AppResource() {
 	}
 
 	@Override
@@ -39,6 +37,9 @@ public class UsersResource implements UsersService, FeedsService {
 			Log.info("User already exists.");
 			throw new WebApplicationException( Status.CONFLICT );
 		}
+
+		feeds.put(user.getName(), new HashMap<>());
+		subs.put(user.getName(), new LinkedList<>());
 
 		return user.getName();
 	}
@@ -122,7 +123,10 @@ public class UsersResource implements UsersService, FeedsService {
 			Log.info("Password is incorrect.");
 			throw new WebApplicationException( Status.FORBIDDEN );
 		}
+
 		users.remove(userId);
+		feeds.remove(userId);
+		subs.remove(userId);
 
 		return user;
 	}
@@ -150,22 +154,103 @@ public class UsersResource implements UsersService, FeedsService {
 
 	@Override
 	public long postMessage(String user, String pwd, Message msg) {
-		return 0;
+		Log.info("postMessage : " + user);
+
+		// Check if user data is valid
+		if(user == null || pwd == null) {
+			Log.info("User object invalid.");
+			throw new WebApplicationException( Status.BAD_REQUEST );
+		}
+
+		User userAux = users.get(user);
+
+		// Insert user, checking if name already exists
+		if(userAux == null || !userAux.getPwd().equals(pwd)) {
+			Log.info("Invalid credentials.");
+			throw new WebApplicationException( Status.FORBIDDEN );
+		}
+
+		feeds.get(user).put(msg.getId(), msg);
+
+		return msg.getId();
 	}
 
 	@Override
 	public void removeFromPersonalFeed(String user, long mid, String pwd) {
+		Log.info("removeFromPersonalFeed : " + user);
+
+		// Check if user data is valid PERGUNTAR PROF
+		if(user == null || pwd == null) {
+			Log.info("User object invalid.");
+			throw new WebApplicationException( Status.BAD_REQUEST );
+		}
+
+		User userAux = users.get(user);
+
+		// Insert user, checking if name already exists
+		if(userAux == null || !userAux.getPwd().equals(pwd)) {
+			Log.info("Invalid credentials.");
+			throw new WebApplicationException( Status.FORBIDDEN );
+		}
+
+		Message msg = feeds.get(user).get(mid);
+
+		if (msg == null) {
+			Log.info("Message does not exist in the server.");
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+
+		feeds.get(user).remove(mid);
 
 	}
 
 	@Override
 	public Message getMessage(String user, long mid) {
-		return null;
+		Log.info("getMessage : " + user);
+
+		// Check if user data is valid PERGUNTAR PROF
+		if(user == null) {
+			Log.info("User object invalid.");
+			throw new WebApplicationException( Status.BAD_REQUEST );
+		}
+
+		Message msg = feeds.get(user).get(mid);
+
+		if (msg == null) {
+			Log.info("Message does not exist in the server.");
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+
+		return msg;
 	}
 
 	@Override
 	public List<Message> getMessages(String user, long time) {
-		return null;
+		//O QUE E SER "REMOTE USER"??????????????????
+
+		Log.info("getMessages : " + user);
+
+		// Check if user data is valid PERGUNTAR PROF
+		if(user == null) {
+			Log.info("User object invalid.");
+			throw new WebApplicationException( Status.BAD_REQUEST );
+		}
+
+		Map<Long, Message> msgs = feeds.get(user);
+
+		if (msgs == null) {
+			Log.info("User does not exist.");
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+
+		List<Message> msgsToReturn = new ArrayList<>();
+
+		for (Message m: msgs.values()) {
+			if (m.getCreationTime() >= time)
+				msgsToReturn.add(m);
+		}
+
+		return msgsToReturn;
 	}
 
 	@Override

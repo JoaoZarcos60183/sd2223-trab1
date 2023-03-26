@@ -8,7 +8,7 @@ import sd2223.trab1.api.api.Discovery;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import sd2223.trab1.api.server.resources.UsersResource;
+import sd2223.trab1.api.server.resources.AppResource;
 
 public class UsersServer {
 
@@ -31,7 +31,7 @@ public class UsersServer {
 			disc.announce(SERVICE, uri);
 
 			ResourceConfig config = new ResourceConfig();
-			config.register(UsersResource.class);
+			config.register(AppResource.class);
 			// config.register(CustomLoggingFilter.class);
 
 			String ip = InetAddress.getLocalHost().getHostAddress();
