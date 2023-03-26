@@ -1,4 +1,4 @@
-package sd2223.trab1.api.rest;
+package sd2223.trab1.api.api.rest;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import sd2223.trab1.api.Message;
-import sd2223.trab1.api.User;
+import sd2223.trab1.api.api.Message;
+import sd2223.trab1.api.api.User;
 
 @Path(FeedsService.PATH)
 public interface FeedsService {
