@@ -3,6 +3,7 @@ package sd2223.trab1.api.server.resources;
 import java.util.*;
 import java.util.logging.Logger;
 
+import sd2223.trab1.api.api.Discovery;
 import sd2223.trab1.api.api.Message;
 import sd2223.trab1.api.api.User;
 import sd2223.trab1.api.api.rest.UsersService;
@@ -16,8 +17,9 @@ public class AppResource implements UsersService, FeedsService {
 
 	private final Map<String,User> users = new HashMap<>();
 	private final Map<String, Map<Long,Message>> feeds = new HashMap<>(); //perguntar ao prof qual e a melhor opcao: so String ou User
-	private final Map<String, List<User>> subs = new HashMap<>();
+	private final Map<String, Map<String, User>> subs = new HashMap<>();
 	private static Logger Log = Logger.getLogger(AppResource.class.getName());
+	Discovery discovery = Discovery.getInstance();
 	
 	public AppResource() {
 	}
@@ -39,7 +41,7 @@ public class AppResource implements UsersService, FeedsService {
 		}
 
 		feeds.put(user.getName(), new HashMap<>());
-		subs.put(user.getName(), new LinkedList<>());
+		subs.put(user.getName(), new HashMap<>());
 
 		return user.getName();
 	}
@@ -226,7 +228,7 @@ public class AppResource implements UsersService, FeedsService {
 
 	@Override
 	public List<Message> getMessages(String user, long time) {
-		//O QUE E SER "REMOTE USER"??????????????????
+		//Fazer Remote
 
 		Log.info("getMessages : " + user);
 
@@ -255,16 +257,58 @@ public class AppResource implements UsersService, FeedsService {
 
 	@Override
 	public void subUser(String user, String userSub, String pwd) {
+		//Fazer Remote
+		Log.info("subUser : " + user);
+
+		if(user == null) {
+			Log.info("User object invalid.");
+			throw new WebApplicationException( Status.BAD_REQUEST );
+		}
+
+		User userToSub = users.get(userSub);
+
+		if(userToSub == null) {
+			Log.info("User to subscribe does not exist.");
+			throw new WebApplicationException( Status.NOT_FOUND);
+		}
+
+		User userSubbing = users.get(user);
+		if (userSubbing==null || !userSubbing.getPwd().equals(pwd)){
+			Log.info("Invalid Credentials.");
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+
+		subs.get(user).put(userSub, userToSub);
 
 	}
 
 	@Override
 	public void unsubscribeUser(String user, String userSub, String pwd) {
+		//Fazer Remote
+		Log.info("subUser : " + user);
 
+		if(user == null) {
+			Log.info("User object invalid.");
+			throw new WebApplicationException( Status.BAD_REQUEST );
+		}
+
+		User userUnsubbing = users.get(user);
+
+		if (userUnsubbing==null || !userUnsubbing.getPwd().equals(pwd)){
+			Log.info("Invalid Credentials.");
+			throw new WebApplicationException(Status.FORBIDDEN);
+		}
+
+		if (!subs.get(user).containsKey(userSub)){
+			Log.info("User is not subscribed.");
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+
+		subs.get(user).remove(userSub);
 	}
 
 	@Override
 	public List<String> listSubs(String user) {
-		return null;
+		return new LinkedList<>(subs.get(user).keySet());
 	}
 }

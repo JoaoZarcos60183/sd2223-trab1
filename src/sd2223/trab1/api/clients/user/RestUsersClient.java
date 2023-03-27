@@ -5,6 +5,7 @@ import java.util.List;
 
 import sd2223.trab1.api.api.User;
 import sd2223.trab1.api.api.rest.UsersService;
+import sd2223.trab1.api.clients.RestClient;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;

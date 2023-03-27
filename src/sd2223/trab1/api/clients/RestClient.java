@@ -1,4 +1,4 @@
-package sd2223.trab1.api.clients.user;
+package sd2223.trab1.api.clients;
 
 import java.net.URI;
 import java.util.function.Supplier;
@@ -21,10 +21,10 @@ public class RestClient {
 	protected static final int MAX_RETRIES = 10;
 
 	final URI serverURI;
-	final Client client;
+	public final Client client;
 	final ClientConfig config;
 
-	RestClient(URI serverURI) {
+	public RestClient(URI serverURI) {
 		this.serverURI = serverURI;
 		this.config = new ClientConfig();
 

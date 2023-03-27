@@ -1,4 +1,4 @@
-package aula3.server.util;
+package sd2223.trab1.api.server.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
