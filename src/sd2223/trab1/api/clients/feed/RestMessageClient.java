@@ -53,6 +53,21 @@ public class RestMessageClient extends RestClient implements FeedsService {
         return 0;
     }
 
+    public int clt_getMessage(String user, long mid) {
+        Response r = target.path( user + "/" + mid ).request()
+                    .accept(MediaType.APPLICATION_JSON)
+                    .get();
+        
+        if( r.getStatus() == Status.NO_CONTENT.getStatusCode() && r.hasEntity() )
+            System.out.println("Deleted Post.");
+        else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
+            System.out.println("Error, HTTP error status: " + r.getStatus() );
+        else 
+            System.out.println("Error, HTTP error status: " + Status.NOT_FOUND);
+
+        return 0;
+    }
+
     @Override
     public long postMessage(String user, String pwd, Message msg) {
         return super.reTry(() -> clt_createMeesage(user, pwd, msg));
