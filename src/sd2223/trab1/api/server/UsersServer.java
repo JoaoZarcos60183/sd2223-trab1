@@ -28,7 +28,7 @@ public class UsersServer {
 		try {
 
 			String uri = String.format(SERVER_URI_FMT, InetAddress.getLocalHost().getHostAddress(), PORT);
-			disc.announce(SERVICE, uri);
+			disc.announce(SERVICE, uri); //Com dois servidores, anunciar repetido? e Qual é o servidor que o Cliente vai buscar? Cada um vai ter nome diferente?
 
 			ResourceConfig config = new ResourceConfig();
 			config.register(AppResource.class);

@@ -27,10 +27,10 @@ public class CreateUserClient {
 		URI[] uris = discovery.knownUrisOf(UsersServer.SERVICE, 1);		
 
 		String serverUrl = uris[0].toString();
-		String name = args[1];
-		String pwd = args[2];
-		String domain = args[3];
-		String displayName = args[4];
+		String name = args[0];
+		String pwd = args[1];
+		String domain = args[2];
+		String displayName = args[3];
 
 		User u = new User(name, pwd, domain, displayName);
 

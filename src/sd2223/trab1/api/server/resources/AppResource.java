@@ -13,7 +13,7 @@ import jakarta.ws.rs.core.Response.Status;
 import sd2223.trab1.api.api.rest.FeedsService;
 
 @Singleton
-public class AppResource implements UsersService, FeedsService {
+public class AppResource implements UsersService, FeedsService { // Servidor e cliente comunicam através das interfaces
 
 	private final Map<String,User> users = new HashMap<>();
 	private final Map<String, Map<Long,Message>> feeds = new HashMap<>(); //perguntar ao prof qual e a melhor opcao: so String ou User

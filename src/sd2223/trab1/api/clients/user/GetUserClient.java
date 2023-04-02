@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.net.URI;
 
 import sd2223.trab1.api.api.Discovery;
+import sd2223.trab1.api.server.UsersServer;
 
 public class GetUserClient {
-
-	public static final String SERVICE = "UsersService";
 	public static void main(String[] args) throws IOException {
 		
 		if( args.length != 2) {
@@ -16,11 +15,11 @@ public class GetUserClient {
 		}
 		
 		Discovery discovery = Discovery.getInstance();
-		URI[] uris = discovery.knownUrisOf(SERVICE, 1);		
+		URI[] uris = discovery.knownUrisOf(UsersServer.SERVICE, 1);		
 
 		String serverUrl = uris[0].toString();
-		String name = args[1];
-		String pwd = args[2];
+		String name = args[0];
+		String pwd = args[1];
 		
 		System.out.println("Sending request to server.");
 		

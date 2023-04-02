@@ -20,8 +20,8 @@ public class DeleteUserClient {
 		URI[] uris = discovery.knownUrisOf(UsersServer.SERVICE, 1);		
 
 		String serverUrl = uris[0].toString();
-		String name = args[1];
-		String pwd = args[2];
+		String name = args[0];
+		String pwd = args[1];
 		
 		System.out.println("Sending request to server.");
 		

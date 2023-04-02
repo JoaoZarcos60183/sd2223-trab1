@@ -16,7 +16,7 @@ public class SearchUsersClient {
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length != 1) {
-			System.err.println("Use: java aula3.clients.SearchUsersClient name ");
+			System.err.println("Use: java aula3.clients.SearchUsersClient pattern ");
 			return;
 		}
 
@@ -24,12 +24,12 @@ public class SearchUsersClient {
 		URI[] uris = discovery.knownUrisOf(UsersServer.SERVICE, 1);		
 
 		String serverUrl = uris[0].toString();
-		String userId = args[1];
+		String pattern = args[0];
 
 
 		System.out.println("Sending request to server.");
 
-		var result = new RestUsersClient(URI.create(serverUrl)).searchUsers(userId);
+		var result = new RestUsersClient(URI.create(serverUrl)).searchUsers(pattern);
 		System.out.println("Success: (" + result.size() + " users)");
 		result.stream().forEach( u -> System.out.println( u));
 

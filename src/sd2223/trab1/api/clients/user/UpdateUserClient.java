@@ -22,11 +22,11 @@ public class UpdateUserClient {
 		URI[] uris = discovery.knownUrisOf(SERVICE, 1);		
 
 		String serverUrl = uris[0].toString();
-		String name = args[1];
-		String oldpwd = args[2];
-		String pwd = args[3];
-		String domain = args[4];
-		String displayName = args[5];
+		String name = args[0];
+		String oldpwd = args[1];
+		String pwd = args[2];
+		String domain = args[3];
+		String displayName = args[4];
 		
 		
 		var u = new User( name, pwd, domain, displayName);
