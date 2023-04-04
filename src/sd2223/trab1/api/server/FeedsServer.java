@@ -4,15 +4,14 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.util.logging.Logger;
 
-import sd2223.trab1.api.api.Discovery;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import sd2223.trab1.api.server.resources.UserResource;
+import sd2223.trab1.api.api.Discovery;
+import sd2223.trab1.api.server.resources.FeedResource;
 
-public class UsersServer {
-
-	private static Logger Log = Logger.getLogger(UsersServer.class.getName());
+public class FeedsServer {
+    private static Logger Log = Logger.getLogger(UsersServer.class.getName());
 
 	static {
 		System.setProperty("java.net.preferIPv4Stack", "true");
@@ -26,7 +25,7 @@ public class UsersServer {
 
 		try {
 
-			if (args.length != 1) {
+			if (args.length != 5) {
 				System.err.println("Use: java aula3.clients.CreateUserClient id name pwd domain message");
 				return;
 			}
@@ -37,7 +36,7 @@ public class UsersServer {
 			disc.announce(service, uri); //Com dois servidores, anunciar repetido? e Qual é o servidor que o Cliente vai buscar? Cada um vai ter nome diferente?
 
 			ResourceConfig config = new ResourceConfig();
-			config.register(UserResource.class);
+			config.register(new FeedResource(service));
 			// config.register(CustomLoggingFilter.class);
 
 			String ip = InetAddress.getLocalHost().getHostAddress();

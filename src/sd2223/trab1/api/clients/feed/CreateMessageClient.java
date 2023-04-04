@@ -5,7 +5,6 @@ import java.net.URI;
 import java.util.logging.Logger;
 import sd2223.trab1.api.api.Message;
 import sd2223.trab1.api.api.Discovery;
-import sd2223.trab1.api.server.UsersServer;
 
 public class CreateMessageClient {
 	
@@ -22,21 +21,21 @@ public class CreateMessageClient {
 			return;
 		}
 
-		Discovery discovery = Discovery.getInstance();
-		URI[] uris = discovery.knownUrisOf(UsersServer.SERVICE, 1);		
+		Discovery discovery = Discovery.getInstance();	
 
-		String serverUrl = uris[0].toString();
         long id = Long.parseLong(args[0]);
 		String name = args[1];
 		String pwd = args[2];
         String domain = args[3];
 		String message = args[4];
 
+		URI[] uris = discovery.knownUrisOf(domain, 1);	
+
         Message m = new Message(id, name, domain, message);
 
 		Log.info("Sending request to server.");
 
-		var result = new RestMessageClient(URI.create(serverUrl)).postMessage(name, pwd, m);
+		var result = new RestMessageClient(uris[0]).postMessage(name, pwd, m);
 		System.out.println("Result: " + result);
 	}
 

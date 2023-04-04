@@ -24,7 +24,7 @@ public class RestMessageClient extends RestClient implements FeedsService {
 		target = client.target( serverURI ).path( FeedsService.PATH );
 	}
 
-    private long clt_createMeesage(String user, String pwd, Message message) {
+    private long clt_createMessage(String user, String pwd, Message message) {
 		Response r = target.path( user )
                 .queryParam(FeedsService.PWD, pwd).request()
 				.post(Entity.entity(message, MediaType.APPLICATION_JSON));
@@ -139,7 +139,7 @@ public class RestMessageClient extends RestClient implements FeedsService {
 
     @Override
     public long postMessage(String user, String pwd, Message msg) {
-        return super.reTry(() -> clt_createMeesage(user, pwd, msg));
+        return super.reTry(() -> clt_createMessage(user, pwd, msg));
     }
 
     @Override
