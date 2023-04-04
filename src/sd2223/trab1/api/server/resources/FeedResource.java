@@ -1,28 +1,16 @@
 package sd2223.trab1.api.server.resources;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
-
 import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.GenericType;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import sd2223.trab1.api.api.Discovery;
 import sd2223.trab1.api.api.Message;
 import sd2223.trab1.api.api.User;
 import sd2223.trab1.api.api.rest.FeedsService;
-import sd2223.trab1.api.api.rest.UsersService;
+import sd2223.trab1.api.clients.user.RestUsersClient;
 
 public class FeedResource implements FeedsService{
     
@@ -30,25 +18,12 @@ public class FeedResource implements FeedsService{
 	private final Map<String, Map<String, User>> subs = new HashMap<>();
     private static Logger Log = Logger.getLogger(UserResource.class.getName());
 	private Discovery discovery = Discovery.getInstance();
-    final WebTarget target;
-    public final Client client;
-	final ClientConfig config;
-    protected static final int READ_TIMEOUT = 5000;
-	protected static final int CONNECT_TIMEOUT = 5000;
+	private URI[] uris;
 
     public FeedResource(String domain){
         String[] arr = domain.split(".");
         String aux = "users." + arr[1];
-        URI[] uris = discovery.knownUrisOf(aux, 1);
-
-        this.config = new ClientConfig();
-
-		config.property(ClientProperties.READ_TIMEOUT, READ_TIMEOUT);
-		config.property( ClientProperties.CONNECT_TIMEOUT, CONNECT_TIMEOUT);
-		
-		this.client = ClientBuilder.newClient(config);
-
-        target = client.target( uris[0] ).path( UsersService.PATH );
+        uris = discovery.knownUrisOf(aux, 1);
     }
 
     @Override
@@ -61,12 +36,7 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-        Response r = target.path( user )
-                    .queryParam(UsersService.PWD, pwd).request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .get();
-
-        User userAux = r.readEntity(User.class);
+        User userAux = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
 
 		// Insert user, checking if name already exists
 		if(userAux == null || !userAux.getPwd().equals(pwd)) {
@@ -95,12 +65,7 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		Response r = target.path( user )
-                    .queryParam(UsersService.PWD, pwd).request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .get();
-
-        User userAux = r.readEntity(User.class);
+		User userAux = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
 
 		// Insert user, checking if name already exists
 		if(userAux == null || !userAux.getPwd().equals(pwd)) {
@@ -129,25 +94,24 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-        Response r = target.path("/").queryParam( UsersService.QUERY, user).request()
-				.accept(MediaType.APPLICATION_JSON)
-				.get();
-
-        List<User> userL = r.readEntity(new GenericType<List<User>>() {});
-
-        boolean aux = false;
-        for (User u: userL)
-            if (u.getName().equals(user))
-            aux = true;
+        List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(user);
 
 		Message msg = feeds.get(user).get(mid);
 
-		if (!aux || msg == null) {
+		if (searchUser(listUsers, user) == null || msg == null) {
 			Log.info("Message or User does not exist in the server.");
 			throw new WebApplicationException(Status.NOT_FOUND);
 		}
 
 		return msg;
+	}
+
+	private User searchUser(List<User> listUsers, String user) {
+		for (User u: listUsers)
+			if (u.getName().equals(user))
+				return u;
+
+		return null;
 	}
 
 	@Override
@@ -162,14 +126,16 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		Map<Long, Message> msgs = feeds.get(user);
+		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(user);
 
-		if (msgs == null) {
+		if (searchUser(listUsers, user) == null) {
 			Log.info("User does not exist.");
 			throw new WebApplicationException(Status.NOT_FOUND);
 		}
 
-		List<Message> msgsToReturn = new ArrayList<>();
+		Map<Long, Message> msgs = feeds.get(user);
+
+		List<Message> msgsToReturn = new LinkedList<>();
 
 		for (Message m: msgs.values()) {
 			if (m.getCreationTime() >= time)
@@ -189,14 +155,15 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		User userToSub = users.get(userSub);
+		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(user);
+		User userToSub = searchUser(listUsers, userSub);
 
 		if(userToSub == null) {
 			Log.info("User to subscribe does not exist.");
 			throw new WebApplicationException( Status.NOT_FOUND);
 		}
 
-		User userSubbing = users.get(user);
+		User userSubbing = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
 		if (userSubbing==null || !userSubbing.getPwd().equals(pwd)){
 			Log.info("Invalid Credentials.");
 			throw new WebApplicationException(Status.FORBIDDEN);
@@ -216,9 +183,9 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		User userUnsubbing = users.get(user);
+		User userUnsubbing = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
 
-		if (userUnsubbing==null || !userUnsubbing.getPwd().equals(pwd)){
+		if (userUnsubbing == null || !userUnsubbing.getPwd().equals(pwd)){
 			Log.info("Invalid Credentials.");
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}

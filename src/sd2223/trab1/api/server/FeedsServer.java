@@ -13,41 +13,41 @@ import sd2223.trab1.api.server.resources.FeedResource;
 public class FeedsServer {
     private static Logger Log = Logger.getLogger(UsersServer.class.getName());
 
-	static {
-		System.setProperty("java.net.preferIPv4Stack", "true");
-	}
+    static {
+        System.setProperty("java.net.preferIPv4Stack", "true");
+    }
 
-	public static final int PORT = 8080;
-	private static final String SERVER_URI_FMT = "http://%s:%s/rest";
+    public static final int PORT = 8080;
+    private static final String SERVER_URI_FMT = "http://%s:%s/rest";
 
-	public static void main(String[] args) {
-		Discovery disc = Discovery.getInstance();
+    public static void main(String[] args) {
+        Discovery disc = Discovery.getInstance();
 
-		try {
+        try {
 
-			if (args.length != 5) {
-				System.err.println("Use: java aula3.clients.CreateUserClient id name pwd domain message");
-				return;
-			}
+            if (args.length != 1) {
+                System.err.println("Use: java aula3.clients.FeedsServer domain");
+                return;
+            }
 
-			String service = args[0];
+            String service ="feeds." + args[0];
 
-			String uri = String.format(SERVER_URI_FMT, InetAddress.getLocalHost().getHostAddress(), PORT);
-			disc.announce(service, uri); //Com dois servidores, anunciar repetido? e Qual é o servidor que o Cliente vai buscar? Cada um vai ter nome diferente?
+            String uri = String.format(SERVER_URI_FMT, InetAddress.getLocalHost().getHostAddress(), PORT);
+            disc.announce(service, uri); //Com dois servidores, anunciar repetido? e Qual e o servidor que o Cliente vai buscar? Cada um vai ter nome diferente?
 
-			ResourceConfig config = new ResourceConfig();
-			config.register(new FeedResource(service));
-			// config.register(CustomLoggingFilter.class);
+            ResourceConfig config = new ResourceConfig();
+            config.register(new FeedResource(service));
+            // config.register(CustomLoggingFilter.class);
 
-			String ip = InetAddress.getLocalHost().getHostAddress();
-			String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
-			JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config);
+            String ip = InetAddress.getLocalHost().getHostAddress();
+            String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
+            JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config);
 
-			Log.info(String.format("%s Server ready @ %s\n", service, serverURI));
+            Log.info(String.format("%s Server ready @ %s\n", service, serverURI));
 
-			// More code can be executed here...
-		} catch (Exception e) {
-			Log.severe(e.getMessage());
-		}
-	}
+            // More code can be executed here...
+        } catch (Exception e) {
+            Log.severe(e.getMessage());
+        }
+    }
 }

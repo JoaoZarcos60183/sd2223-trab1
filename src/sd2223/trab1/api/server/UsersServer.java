@@ -27,14 +27,14 @@ public class UsersServer {
 		try {
 
 			if (args.length != 1) {
-				System.err.println("Use: java aula3.clients.CreateUserClient id name pwd domain message");
+				System.err.println("Use: java aula3.clients.UsersServer domain");
 				return;
 			}
 
-			String service = args[0];
+			String service = "users." + args[0];
 
 			String uri = String.format(SERVER_URI_FMT, InetAddress.getLocalHost().getHostAddress(), PORT);
-			disc.announce(service, uri); //Com dois servidores, anunciar repetido? e Qual é o servidor que o Cliente vai buscar? Cada um vai ter nome diferente?
+			disc.announce(service, uri); //Com dois servidores, anunciar repetido? e Qual Ã© o servidor que o Cliente vai buscar? Cada um vai ter nome diferente?
 
 			ResourceConfig config = new ResourceConfig();
 			config.register(UserResource.class);

@@ -14,15 +14,17 @@ public class GetMessageClient {
 		}
 		
 		Discovery discovery = Discovery.getInstance();
-		URI[] uris = discovery.knownUrisOf(UsersServer.SERVICE, 1);		
 
-		String serverUrl = uris[0].toString();
-		String name = args[0];
+		String[] userAndDomain = args[0].split("@");
 		long mid = Long.parseLong(args[1]);
+
+		String user = userAndDomain[0];
+		String domain ="feeds." + userAndDomain[2];
+		URI[] uris = discovery.knownUrisOf(domain, 1);
 		
 		System.out.println("Sending request to server.");
 		
-		var result = new RestMessageClient(URI.create(serverUrl)).getMessage(name, mid);
+		var result = new RestMessageClient(uris[uris.length-1]).getMessage(user, mid);
 		System.out.println("Result: " + result);
 
 		System.exit(0);

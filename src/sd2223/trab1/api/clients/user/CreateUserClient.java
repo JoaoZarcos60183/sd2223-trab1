@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import sd2223.trab1.api.api.Discovery;
 import sd2223.trab1.api.api.User;
-import sd2223.trab1.api.server.UsersServer;
 
 public class CreateUserClient {
 	
@@ -24,19 +23,20 @@ public class CreateUserClient {
 		}
 
 		Discovery discovery = Discovery.getInstance();
-		URI[] uris = discovery.knownUrisOf(UsersServer.SERVICE, 1);		
 
-		String serverUrl = uris[0].toString();
-		String name = args[0];
+		String[] userAndDomain = args[0].split("@");
 		String pwd = args[1];
-		String domain = args[2];
-		String displayName = args[3];
+		String displayName = args[2];
+		String user = userAndDomain[0];
+		String domain = "users." + userAndDomain[1];
 
-		User u = new User(name, pwd, domain, displayName);
+		URI[] uris = discovery.knownUrisOf(domain, 1);
+
+		User u = new User(user, pwd, userAndDomain[1], displayName);
 
 		Log.info("Sending request to server.");
 
-		var result = new RestUsersClient(URI.create(serverUrl)).createUser(u);
+		var result = new RestUsersClient(uris[uris.length-1]).createUser(u);
 		System.out.println("Result: " + result);
 	}
 

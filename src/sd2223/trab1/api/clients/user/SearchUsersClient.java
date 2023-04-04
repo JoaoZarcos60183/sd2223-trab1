@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import sd2223.trab1.api.api.Discovery;
-import sd2223.trab1.api.server.UsersServer;
 
 
 public class SearchUsersClient {
@@ -21,15 +20,15 @@ public class SearchUsersClient {
 		}
 
 		Discovery discovery = Discovery.getInstance();
-		URI[] uris = discovery.knownUrisOf(UsersServer.SERVICE, 1);		
 
-		String serverUrl = uris[0].toString();
-		String pattern = args[0];
+		String[] userAndDomain = args[0].split("@");
+		String pattern = args[1];
+		String domain = "users." + userAndDomain[1];
 
-
+		URI[] uris = discovery.knownUrisOf(domain, 1);
 		System.out.println("Sending request to server.");
 
-		var result = new RestUsersClient(URI.create(serverUrl)).searchUsers(pattern);
+		var result = new RestUsersClient(uris[uris.length-1]).searchUsers(pattern);
 		System.out.println("Success: (" + result.size() + " users)");
 		result.stream().forEach( u -> System.out.println( u));
 

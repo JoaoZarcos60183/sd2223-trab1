@@ -9,8 +9,6 @@ import sd2223.trab1.api.api.User;
 
 public class UpdateUserClient {
 
-	public static final String SERVICE = "UsersService";
-
 	public static void main(String[] args) throws IOException {
 		
 		if( args.length != 5) {
@@ -19,26 +17,26 @@ public class UpdateUserClient {
 		}
 		
 		Discovery discovery = Discovery.getInstance();
-		URI[] uris = discovery.knownUrisOf(SERVICE, 1);		
 
-		String serverUrl = uris[0].toString();
-		String name = args[0];
+		String[] userAndDomain = args[0].split("@");
 		String oldpwd = args[1];
 		String pwd = args[2];
-		String domain = args[3];
-		String displayName = args[4];
-		
-		
-		var u = new User( name, pwd, domain, displayName);
+		String displayName = args[3];
+
+		String name = userAndDomain[0];
+		String domain = "users." + userAndDomain[1];
+		URI[] uris = discovery.knownUrisOf(domain, 1);
+
+		var u = new User( name, pwd, userAndDomain[1], displayName);
 		
 		System.out.println("Sending request to server.");
 		
 		//TODO complete this client code
 
-		var result = new RestUsersClient(URI.create(serverUrl)).updateUser(name, oldpwd, u);
+		var result = new RestUsersClient(uris[uris.length-1]).updateUser(name, oldpwd, u);
 		System.out.println("Result: " + result);
 
-			System.exit(0);
+		System.exit(0);
 	}
 	
 }

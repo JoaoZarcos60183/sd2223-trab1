@@ -25,6 +25,7 @@ public class RestMessageClient extends RestClient implements FeedsService {
 	}
 
     private long clt_createMessage(String user, String pwd, Message message) {
+
 		Response r = target.path( user )
                 .queryParam(FeedsService.PWD, pwd).request()
 				.post(Entity.entity(message, MediaType.APPLICATION_JSON));

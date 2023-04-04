@@ -24,18 +24,20 @@ public class CreateMessageClient {
 		Discovery discovery = Discovery.getInstance();	
 
         long id = Long.parseLong(args[0]);
-		String name = args[1];
-		String pwd = args[2];
-        String domain = args[3];
-		String message = args[4];
+		String[] userAndDomain = args[1].split("@");
+		String msg = args[2];
+		String pwd = args[3];
+
+        String user = userAndDomain[0];
+		String domain = "feeds." + userAndDomain[1];
 
 		URI[] uris = discovery.knownUrisOf(domain, 1);	
 
-        Message m = new Message(id, name, domain, message);
+        Message m = new Message(-1, user, userAndDomain[1], msg);
 
 		Log.info("Sending request to server.");
 
-		var result = new RestMessageClient(uris[0]).postMessage(name, pwd, m);
+		var result = new RestMessageClient(uris[uris.length-1]).postMessage(user, pwd, m);
 		System.out.println("Result: " + result);
 	}
 
