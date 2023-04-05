@@ -25,18 +25,19 @@ public class FeedsServer {
 
         try {
 
-            if (args.length != 1) {
-                System.err.println("Use: java aula3.clients.FeedsServer domain");
+            if (args.length != 2) {
+                System.err.println("Use: java aula3.clients.FeedsServer domain number");
                 return;
             }
 
             String service ="feeds." + args[0];
+            int number = Integer.parseInt(args[1]);
 
             String uri = String.format(SERVER_URI_FMT, InetAddress.getLocalHost().getHostAddress(), PORT);
-            disc.announce(service, uri); //Com dois servidores, anunciar repetido? e Qual e o servidor que o Cliente vai buscar? Cada um vai ter nome diferente?
+            disc.announce(service, uri);
 
             ResourceConfig config = new ResourceConfig();
-            config.register(new FeedResource(service));
+            config.register(new FeedResource(service, number));
             // config.register(CustomLoggingFilter.class);
 
             String ip = InetAddress.getLocalHost().getHostAddress();

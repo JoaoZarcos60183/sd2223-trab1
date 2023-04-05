@@ -19,11 +19,14 @@ public class FeedResource implements FeedsService{
     private static Logger Log = Logger.getLogger(UserResource.class.getName());
 	private Discovery discovery = Discovery.getInstance();
 	private URI[] uris;
+	private long number, counter;
 
-    public FeedResource(String domain){
+    public FeedResource(String domain, int number){
         String[] arr = domain.split(".");
         String aux = "users." + arr[1];
         uris = discovery.knownUrisOf(aux, 1);
+		this.number = number;
+		counter = 0;
     }
 
     @Override
@@ -44,6 +47,8 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.FORBIDDEN );
 		}
 
+		msg.setId((counter++) * 256 + number);
+
         if (feeds.containsKey(userAux.getName()))
 		    feeds.get(user).put(msg.getId(), msg);
         else{
@@ -59,7 +64,7 @@ public class FeedResource implements FeedsService{
 	public void removeFromPersonalFeed(String user, long mid, String pwd) {
 		Log.info("removeFromPersonalFeed : " + user);
 
-		// Check if user data is valid PERGUNTAR PROF
+		// Check if user data is valid
 		if(user == null || pwd == null) {
 			Log.info("User object invalid.");
 			throw new WebApplicationException( Status.BAD_REQUEST );
@@ -88,7 +93,7 @@ public class FeedResource implements FeedsService{
 	public Message getMessage(String user, long mid) {
 		Log.info("getMessage : " + user);
 
-		// Check if user data is valid PERGUNTAR PROF
+		// Check if user data is valid
 		if(user == null) {
 			Log.info("User object invalid.");
 			throw new WebApplicationException( Status.BAD_REQUEST );
@@ -120,7 +125,7 @@ public class FeedResource implements FeedsService{
 
 		Log.info("getMessages : " + user);
 
-		// Check if user data is valid PERGUNTAR PROF
+		// Check if user data is valid
 		if(user == null) {
 			Log.info("User object invalid.");
 			throw new WebApplicationException( Status.BAD_REQUEST );

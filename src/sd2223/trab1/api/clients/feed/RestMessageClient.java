@@ -85,7 +85,7 @@ public class RestMessageClient extends RestClient implements FeedsService {
         else if (r.getStatus() == Status.NOT_FOUND.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus() );
 
-        return new LinkedList<Message>();
+        return new LinkedList<>();
     }
 
     private int clt_subUser(String user, String userSub, String pwd) {
