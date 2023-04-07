@@ -27,7 +27,7 @@ public class GetMessagesClient {
 
         System.out.println("Sending request to server.");
 
-        var result = new RestMessageClient(uris[uris.length-1]).getMessages(user, time);
+        var result = new RestMessageClient(uris[uris.length-1]).getMessages(args[0], time);
         System.out.println("Success: (" + result.size() + " users)");
         result.stream().forEach(u -> System.out.println(u));
     }

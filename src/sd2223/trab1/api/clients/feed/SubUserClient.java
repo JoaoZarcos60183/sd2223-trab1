@@ -31,7 +31,7 @@ public class SubUserClient {
 
         System.out.println("Sending request to server.");
 
-        new RestMessageClient(uris[uris.length-1]).subUser(user, userSub, pwd);
+        new RestMessageClient(uris[uris.length-1]).subUser(args[0], userSub, pwd);
         System.out.println("Success: " + user + " subscribed " + userSub);
     }
     

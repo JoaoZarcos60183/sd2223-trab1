@@ -23,7 +23,7 @@ public class GetMessageClient {
 		
 		System.out.println("Sending request to server.");
 		
-		var result = new RestMessageClient(uris[uris.length-1]).getMessage(user, mid);
+		var result = new RestMessageClient(uris[uris.length-1]).getMessage(args[0], mid);
 		System.out.println("Result: " + result);
 
 		System.exit(0);

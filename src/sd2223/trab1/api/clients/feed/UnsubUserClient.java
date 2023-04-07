@@ -29,7 +29,7 @@ public class UnsubUserClient {static {
 
         System.out.println("Sending request to server.");
 
-        new RestMessageClient(uris[uris.length-1]).unsubscribeUser(user, userSub, pwd);
+        new RestMessageClient(uris[uris.length-1]).unsubscribeUser(args[0], userSub, pwd);
         System.out.println("Success: " + user + " unsubscribed " + userSub);
     }
     

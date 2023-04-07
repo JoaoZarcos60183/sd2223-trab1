@@ -26,7 +26,7 @@ public class DeleteMessageClient {
 		System.out.println("Sending request to server.");
 		
 		//TODO complete this client code
-		new RestMessageClient(uris[uris.length-1]).removeFromPersonalFeed(user, mid, pwd);
+		new RestMessageClient(uris[uris.length-1]).removeFromPersonalFeed(args[0], mid, pwd);
 		System.out.println("Post was deleted.");
 	
 		System.exit(0);
