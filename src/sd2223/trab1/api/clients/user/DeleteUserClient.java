@@ -24,7 +24,6 @@ public class DeleteUserClient {
 		
 		System.out.println("Sending request to server.");
 		
-		//TODO complete this client code
 		var result = new RestUsersClient(uris[uris.length-1]).deleteUser(user, pwd);
 		System.out.println("Result: " + result);
 	

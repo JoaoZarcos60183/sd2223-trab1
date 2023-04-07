@@ -25,21 +25,21 @@ public class FeedsServer {
 
         try {
 
-            if (args.length != 2) {
-                System.err.println("Use: java aula3.clients.FeedsServer domain number");
+            if (args.length != 1) {
+                System.err.println("Use: java aula3.clients.FeedsServer domain");
+                System.exit(0);
                 return;
             }
 
             String service ="feeds." + args[0];
-            int number = Integer.parseInt(args[1]);
 
             String uri = String.format(SERVER_URI_FMT, InetAddress.getLocalHost().getHostAddress(), PORT);
             disc.announce(service, uri);
 
             ResourceConfig config = new ResourceConfig();
-            config.register(new FeedResource(service, number));
-            // config.register(CustomLoggingFilter.class);
 
+            config.register(FeedResource.class);
+            
             String ip = InetAddress.getLocalHost().getHostAddress();
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
             JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config);

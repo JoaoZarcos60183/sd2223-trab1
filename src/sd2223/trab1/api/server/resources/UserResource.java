@@ -142,7 +142,8 @@ public class UserResource implements UsersService { // Servidor e cliente comuni
 		if (!aux.isEmpty())
 			return aux;
 		else
-			throw new WebApplicationException(Status.NO_CONTENT);
+			return new LinkedList<>();
+		
 	}
 
 }

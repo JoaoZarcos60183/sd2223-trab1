@@ -18,14 +18,10 @@ public class FeedResource implements FeedsService{
 	private final Map<String, Map<String, User>> subs = new HashMap<>();
     private static Logger Log = Logger.getLogger(UserResource.class.getName());
 	private Discovery discovery = Discovery.getInstance();
-	private URI[] uris;
 	private long number, counter;
 
-    public FeedResource(String domain, int number){
-        String[] arr = domain.split(".");
-        String aux = "users." + arr[1];
-        uris = discovery.knownUrisOf(aux, 1);
-		this.number = number;
+    public FeedResource(){
+		this.number = (long) (Math.random() * Math.random() * 170000);
 		counter = 0;
     }
 
@@ -39,7 +35,11 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-        User userAux = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
+		String[] arr = user.split("@");
+        String aux = "users." + arr[1];
+		URI[] uris = discovery.knownUrisOf(aux, 1);
+
+        User userAux = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
 
 		// Insert user, checking if name already exists
 		if(userAux == null || !userAux.getPwd().equals(pwd)) {
@@ -70,7 +70,11 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		User userAux = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
+		String[] arr = user.split("@");
+        String aux = "users." + arr[1];
+		URI[] uris = discovery.knownUrisOf(aux, 1);
+
+		User userAux = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
 
 		// Insert user, checking if name already exists
 		if(userAux == null || !userAux.getPwd().equals(pwd)) {
@@ -99,7 +103,11 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-        List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(user);
+		String[] arr = user.split("@");
+        String aux = "users." + arr[1];
+		URI[] uris = discovery.knownUrisOf(aux, 0);
+
+        List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
 
 		Message msg = feeds.get(user).get(mid);
 
@@ -131,7 +139,11 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(user);
+		String[] arr = user.split("@");
+        String aux = "users." + arr[1];
+		URI[] uris = discovery.knownUrisOf(aux, 0);
+
+		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
 
 		if (searchUser(listUsers, user) == null) {
 			Log.info("User does not exist.");
@@ -160,7 +172,11 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(user);
+		String[] arr = userSub.split("@");
+        String aux = "users." + arr[1];
+		URI[] uris = discovery.knownUrisOf(aux, 0);
+
+		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
 		User userToSub = searchUser(listUsers, userSub);
 
 		if(userToSub == null) {
@@ -168,7 +184,11 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.NOT_FOUND);
 		}
 
-		User userSubbing = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
+		arr = user.split("@");
+        aux = "users." + arr[1];
+		uris = discovery.knownUrisOf(aux, 0);
+
+		User userSubbing = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
 		if (userSubbing==null || !userSubbing.getPwd().equals(pwd)){
 			Log.info("Invalid Credentials.");
 			throw new WebApplicationException(Status.FORBIDDEN);
@@ -188,16 +208,26 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		User userUnsubbing = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
+		String[] arr = user.split("@");
+        String aux = "users." + arr[1];
+		URI[] uris = discovery.knownUrisOf(aux, 0);
 
+		User userUnsubbing = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
+
+		arr = userSub.split("@");
+        aux = "users." + arr[1];
+		uris = discovery.knownUrisOf(aux, 0);
+
+		User userToUnsub = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
+
+		if (userUnsubbing == null || userToUnsub == null){
+			Log.info("User is not subscribed.");
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+		
 		if (userUnsubbing == null || !userUnsubbing.getPwd().equals(pwd)){
 			Log.info("Invalid Credentials.");
 			throw new WebApplicationException(Status.FORBIDDEN);
-		}
-
-		if (!subs.get(user).containsKey(userSub)){
-			Log.info("User is not subscribed.");
-			throw new WebApplicationException(Status.NOT_FOUND);
 		}
 
 		subs.get(user).remove(userSub);

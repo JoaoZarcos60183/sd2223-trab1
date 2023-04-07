@@ -3,7 +3,6 @@ package sd2223.trab1.api.clients.feed;
 import java.io.IOException;
 import java.net.URI;
 import sd2223.trab1.api.api.Discovery;
-import sd2223.trab1.api.server.UsersServer;
 
 public class DeleteMessageClient {
 

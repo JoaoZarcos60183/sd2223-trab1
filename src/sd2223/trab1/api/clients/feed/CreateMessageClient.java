@@ -16,17 +16,16 @@ public class CreateMessageClient {
 	
 	public static void main(String[] args) throws IOException {
 				
-		if (args.length != 5) {
-			System.err.println("Use: java aula3.clients.CreateUserClient id name pwd domain message");
+		if (args.length != 3) {
+			System.err.println("Use: java aula3.clients.CreateUserClient name message pwd ");
 			return;
 		}
 
 		Discovery discovery = Discovery.getInstance();	
 
-        long id = Long.parseLong(args[0]);
-		String[] userAndDomain = args[1].split("@");
-		String msg = args[2];
-		String pwd = args[3];
+		String[] userAndDomain = args[0].split("@");
+		String msg = args[1];
+		String pwd = args[2];
 
         String user = userAndDomain[0];
 		String domain = "feeds." + userAndDomain[1];
@@ -37,8 +36,10 @@ public class CreateMessageClient {
 
 		Log.info("Sending request to server.");
 
-		var result = new RestMessageClient(uris[uris.length-1]).postMessage(user, pwd, m);
+		var result = new RestMessageClient(uris[uris.length-1]).postMessage(args[0], pwd, m);
 		System.out.println("Result: " + result);
+
+		System.exit(0);
 	}
 
 }

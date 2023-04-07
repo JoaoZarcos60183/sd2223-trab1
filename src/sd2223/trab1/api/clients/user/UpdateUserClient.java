@@ -11,8 +11,8 @@ public class UpdateUserClient {
 
 	public static void main(String[] args) throws IOException {
 		
-		if( args.length != 5) {
-			System.err.println( "Use: java aula2.clients.UpdateUserClient name oldpwd pwd domain displayName");
+		if( args.length != 4) {
+			System.err.println( "Use: java aula2.clients.UpdateUserClient name oldpwd pwd displayName");
 			return;
 		}
 		

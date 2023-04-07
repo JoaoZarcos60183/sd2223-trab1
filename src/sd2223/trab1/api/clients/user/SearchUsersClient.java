@@ -21,17 +21,17 @@ public class SearchUsersClient {
 
 		Discovery discovery = Discovery.getInstance();
 
-		String[] userAndDomain = args[0].split("@");
-		String pattern = args[1];
-		String domain = "users." + userAndDomain[1];
+		String pattern = args[0];
+		String domain = "users.nova";
 
-		URI[] uris = discovery.knownUrisOf(domain, 1);
+		URI[] uris = discovery.knownUrisOf(domain, 1); //Como ir buscar os restantes users de domains diferentes, ou seja sem passar os domains nos argumentos
 		System.out.println("Sending request to server.");
 
 		var result = new RestUsersClient(uris[uris.length-1]).searchUsers(pattern);
 		System.out.println("Success: (" + result.size() + " users)");
 		result.stream().forEach( u -> System.out.println( u));
 
+		System.exit(0);
 	}
 
 }

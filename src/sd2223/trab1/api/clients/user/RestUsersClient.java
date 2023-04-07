@@ -86,8 +86,6 @@ public class RestUsersClient extends RestClient implements UsersService {
 
 		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
 			return r.readEntity(new GenericType<List<User>>() {});
-			//System.out.println("Success: (" + users.size() + " users)");
-			//users.stream().forEach( u -> System.out.println( u));
 		} else
 			System.out.println("Error, HTTP error status: " + r.getStatus() );
 		return null;
@@ -105,19 +103,16 @@ public class RestUsersClient extends RestClient implements UsersService {
 
 	@Override
 	public User updateUser(String name, String pwd, User user) {
-		// TODO Auto-generated method stub
 		return super.reTry(() -> clt_updateUser(name, pwd, user));
 	}
 
 	@Override
 	public User deleteUser(String name, String pwd) {
-		// TODO Auto-generated method stub
 		return super.reTry(() -> clt_deleteUser(name, pwd));
 	}
 
 	@Override
 	public List<User> searchUsers(String pattern) {
-		// TODO Auto-generated method stub
 		return super.reTry(() -> clt_searchUsers(pattern));
 	}
 }

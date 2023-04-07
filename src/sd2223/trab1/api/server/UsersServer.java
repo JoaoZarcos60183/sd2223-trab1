@@ -28,6 +28,7 @@ public class UsersServer {
 
 			if (args.length != 1) {
 				System.err.println("Use: java aula3.clients.UsersServer domain");
+				System.exit(0);
 				return;
 			}
 

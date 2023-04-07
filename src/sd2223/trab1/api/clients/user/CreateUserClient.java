@@ -17,8 +17,8 @@ public class CreateUserClient {
 	
 	public static void main(String[] args) throws IOException {
 				
-		if (args.length != 4) {
-			System.err.println("Use: java aula3.clients.CreateUserClient name pwd domain displayName");
+		if (args.length != 3) {
+			System.err.println("Use: java aula3.clients.CreateUserClient name pwd displayName");
 			return;
 		}
 
@@ -38,6 +38,8 @@ public class CreateUserClient {
 
 		var result = new RestUsersClient(uris[uris.length-1]).createUser(u);
 		System.out.println("Result: " + result);
+
+		System.exit(0);
 	}
 
 }
