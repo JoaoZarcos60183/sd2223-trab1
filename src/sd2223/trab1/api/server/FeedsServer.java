@@ -11,7 +11,7 @@ import sd2223.trab1.api.api.Discovery;
 import sd2223.trab1.api.server.resources.FeedResource;
 
 public class FeedsServer {
-    private static Logger Log = Logger.getLogger(UsersServer.class.getName());
+    private static Logger Log = Logger.getLogger(FeedsServer.class.getName());
 
     static {
         System.setProperty("java.net.preferIPv4Stack", "true");
@@ -26,7 +26,7 @@ public class FeedsServer {
         try {
 
             if (args.length != 1) {
-                System.err.println("Use: java aula3.clients.FeedsServer domain");
+                System.err.println("Use: domain");
                 System.exit(0);
                 return;
             }

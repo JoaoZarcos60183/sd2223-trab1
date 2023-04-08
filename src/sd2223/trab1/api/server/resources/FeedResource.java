@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.logging.Logger;
 
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 import sd2223.trab1.api.api.Discovery;
@@ -12,10 +13,11 @@ import sd2223.trab1.api.api.User;
 import sd2223.trab1.api.api.rest.FeedsService;
 import sd2223.trab1.api.clients.user.RestUsersClient;
 
+@Singleton
 public class FeedResource implements FeedsService{
     
-    private final Map<String, Map<Long,Message>> feeds = new HashMap<>(); //perguntar ao prof qual e a melhor opcao: so String ou User
-	private final Map<String, Map<String, User>> subs = new HashMap<>();
+    private Map<String, Map<Long,Message>> feeds = new HashMap<>();
+	private Map<String, Map<String, User>> subs = new HashMap<>();
     private static Logger Log = Logger.getLogger(UserResource.class.getName());
 	private Discovery discovery = Discovery.getInstance();
 	private long number, counter;
@@ -50,11 +52,11 @@ public class FeedResource implements FeedsService{
 		msg.setId((counter++) * 256 + number);
 
         if (feeds.containsKey(userAux.getName()))
-		    feeds.get(user).put(msg.getId(), msg);
+		    feeds.get(arr[0]).put(msg.getId(), msg);
         else{
             Map<Long, Message> auxMap = new HashMap<>();
             auxMap.put(msg.getId(), msg);
-            feeds.put(user, auxMap);
+            feeds.put(arr[0], auxMap);
         }
 
 		return msg.getId();
@@ -82,14 +84,14 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.FORBIDDEN );
 		}
 
-		Message msg = feeds.get(user).get(mid);
+		Message msg = feeds.get(arr[0]).get(mid);
 
 		if (msg == null) {
 			Log.info("Message does not exist in the server.");
 			throw new WebApplicationException(Status.NOT_FOUND);
 		}
 
-		feeds.get(user).remove(mid);
+		feeds.get(arr[0]).remove(mid);
 
 	}
 
@@ -109,9 +111,9 @@ public class FeedResource implements FeedsService{
 
         List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
 
-		Message msg = feeds.get(user).get(mid);
+		Message msg = feeds.get(arr[0]).get(mid);
 
-		if (searchUser(listUsers, user) == null || msg == null) {
+		if (searchUser(listUsers, arr[0]) == null || msg  == null) {
 			Log.info("Message or User does not exist in the server.");
 			throw new WebApplicationException(Status.NOT_FOUND);
 		}
@@ -145,12 +147,12 @@ public class FeedResource implements FeedsService{
 
 		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
 
-		if (searchUser(listUsers, user) == null) {
+		if (searchUser(listUsers, arr[0]) == null) {
 			Log.info("User does not exist.");
 			throw new WebApplicationException(Status.NOT_FOUND);
 		}
 
-		Map<Long, Message> msgs = feeds.get(user);
+		Map<Long, Message> msgs = feeds.get(arr[0]);
 
 		List<Message> msgsToReturn = new LinkedList<>();
 
@@ -167,6 +169,8 @@ public class FeedResource implements FeedsService{
 		//Fazer Remote
 		Log.info("subUser : " + user);
 
+		System.out.println("Olá");
+
 		if(user == null) {
 			Log.info("User object invalid.");
 			throw new WebApplicationException( Status.BAD_REQUEST );
@@ -175,9 +179,10 @@ public class FeedResource implements FeedsService{
 		String[] arr = userSub.split("@");
         String aux = "users." + arr[1];
 		URI[] uris = discovery.knownUrisOf(aux, 0);
+		String userSubAux = arr[0];
 
 		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
-		User userToSub = searchUser(listUsers, userSub);
+		User userToSub = searchUser(listUsers, arr[0]);
 
 		if(userToSub == null) {
 			Log.info("User to subscribe does not exist.");
@@ -194,14 +199,21 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 
-		subs.get(user).put(userSub, userToSub);
+
+		if (subs.containsKey(arr[0]))
+			subs.get(arr[0]).put(userSubAux, userToSub);
+        else{
+            Map<String, User> auxMap = new HashMap<>();
+            auxMap.put(userSubAux, userToSub);
+            subs.put(arr[0], auxMap);
+        }
 
 	}
 
 	@Override
 	public void unsubscribeUser(String user, String userSub, String pwd) {
 		//Fazer Remote
-		Log.info("subUser : " + user);
+		Log.info("UnsubUser : " + user);
 
 		if(user == null) {
 			Log.info("User object invalid.");
@@ -211,6 +223,7 @@ public class FeedResource implements FeedsService{
 		String[] arr = user.split("@");
         String aux = "users." + arr[1];
 		URI[] uris = discovery.knownUrisOf(aux, 0);
+		String userAux = arr[0];
 
 		User userUnsubbing = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
 
@@ -230,12 +243,14 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 
-		subs.get(user).remove(userSub);
+		subs.get(userAux).remove(arr[0]);
 	}
 
 	@Override
 	public List<String> listSubs(String user) {
-		return new LinkedList<>(subs.get(user).keySet());
+		Log.info("ListSubs of : " + user);
+		String[] arr = user.split("@");
+		return new LinkedList<>(subs.get(arr[0]).keySet());
 	}
 
     

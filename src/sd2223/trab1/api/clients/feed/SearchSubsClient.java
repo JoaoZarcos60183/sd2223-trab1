@@ -21,16 +21,17 @@ public class SearchSubsClient {
 
         String[] userAndDomain = args[0].split("@");
 
-        String user = userAndDomain[0];
         String domain = "feeds." + userAndDomain[1];
 
         URI[] uris = discovery.knownUrisOf(domain, 1);
 
         System.out.println("Sending request to server.");
 
-        var result = new RestMessageClient(uris[uris.length-1]).listSubs(user);
+        var result = new RestMessageClient(uris[uris.length-1]).listSubs(args[0]);
         System.out.println("Success: (" + result.size() + " users)");
         result.stream().forEach(u -> System.out.println(u));
+    
+        System.exit(0);
     }
     
 }

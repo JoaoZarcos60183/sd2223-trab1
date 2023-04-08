@@ -25,7 +25,6 @@ public class RestMessageClient extends RestClient implements FeedsService {
 	}
 
     private long clt_createMessage(String user, String pwd, Message message) {
-
 		Response r = target.path( user )
                 .queryParam(FeedsService.PWD, pwd).request()
 				.post(Entity.entity(message, MediaType.APPLICATION_JSON));
@@ -41,11 +40,11 @@ public class RestMessageClient extends RestClient implements FeedsService {
 	}
 
     private int clt_removeFromPersonalFeed(String user, long mid, String pwd) {
-        Response r = target.path( user + "/" + mid )
+        Response r = target.path( user ).path(String.valueOf(mid))
                 .queryParam(FeedsService.PWD, pwd).request()
 				.delete();
         
-        if( r.getStatus() == Status.NO_CONTENT.getStatusCode() && r.hasEntity() )
+        if( r.getStatus() == Status.NO_CONTENT.getStatusCode())
             System.out.println("Deleted Post.");
         else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus() );
@@ -60,7 +59,7 @@ public class RestMessageClient extends RestClient implements FeedsService {
                     .accept(MediaType.APPLICATION_JSON)
                     .get();
         
-        if( r.getStatus() == Status.NO_CONTENT.getStatusCode() && r.hasEntity() ){
+        if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
             System.out.println("Message Obtained."); 
             return r.readEntity(Message.class);
         }
@@ -92,15 +91,17 @@ public class RestMessageClient extends RestClient implements FeedsService {
         Response r = target.path( "/sub/" + user + "/" + userSub )
                     .queryParam(FeedsService.PWD, pwd).request()
                     .accept(MediaType.APPLICATION_JSON)
-                    .post(Entity.entity(User.class, MediaType.APPLICATION_JSON)); //O que colocar aqui em vez da class user, temos que o ir buscar?
+                    .post(Entity.entity(User.class, MediaType.APPLICATION_JSON));
         
-        if( r.getStatus() == Status.NO_CONTENT.getStatusCode() && r.hasEntity() ){
+        if( r.getStatus() == Status.NO_CONTENT.getStatusCode()){
             System.out.println("User was subed");
         }
         else if (r.getStatus() == Status.NOT_FOUND.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus() );
         else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus());
+        
+            System.out.println(r.getStatus());
 
         return 0;
     }
@@ -111,13 +112,15 @@ public class RestMessageClient extends RestClient implements FeedsService {
                     .accept(MediaType.APPLICATION_JSON)
                     .delete();
         
-        if( r.getStatus() == Status.NO_CONTENT.getStatusCode() && r.hasEntity() ){
+        if( r.getStatus() == Status.NO_CONTENT.getStatusCode()){
             System.out.println("User was unsubed");
         }
         else if (r.getStatus() == Status.NOT_FOUND.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus() );
         else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus());
+
+        System.out.println(r.getStatus());
 
         return 0;
     }
@@ -128,13 +131,15 @@ public class RestMessageClient extends RestClient implements FeedsService {
                     .accept(MediaType.APPLICATION_JSON)
                     .get();
         
-        if( r.getStatus() == Status.NO_CONTENT.getStatusCode() && r.hasEntity() ){
+        if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
             System.out.println("The list:");
             return r.readEntity(new GenericType<List<String>>() {});
         }
         else if (r.getStatus() == Status.NOT_FOUND.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus() );
 
+        System.out.println(r.getStatus());
+        
         return new LinkedList<>();
     }
 

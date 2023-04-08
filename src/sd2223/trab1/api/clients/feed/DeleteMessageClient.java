@@ -19,15 +19,13 @@ public class DeleteMessageClient {
 		String pwd = args[1];
         long mid = Long.parseLong(args[2]);
 
-		String user = userAndDomain[0];
 		String domain = "feeds." + userAndDomain[1];
 		URI[] uris = discovery.knownUrisOf(domain, 1);
 		
 		System.out.println("Sending request to server.");
 		
-		//TODO complete this client code
+		System.out.println(uris[uris.length-1]);
 		new RestMessageClient(uris[uris.length-1]).removeFromPersonalFeed(args[0], mid, pwd);
-		System.out.println("Post was deleted.");
 	
 		System.exit(0);
 	}

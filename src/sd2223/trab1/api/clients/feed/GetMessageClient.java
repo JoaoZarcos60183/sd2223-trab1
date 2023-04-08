@@ -17,8 +17,7 @@ public class GetMessageClient {
 		String[] userAndDomain = args[0].split("@");
 		long mid = Long.parseLong(args[1]);
 
-		String user = userAndDomain[0];
-		String domain ="feeds." + userAndDomain[2];
+		String domain ="feeds." + userAndDomain[1];
 		URI[] uris = discovery.knownUrisOf(domain, 1);
 		
 		System.out.println("Sending request to server.");

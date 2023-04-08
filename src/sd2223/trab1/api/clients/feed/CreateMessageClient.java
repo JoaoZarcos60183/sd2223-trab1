@@ -36,6 +36,7 @@ public class CreateMessageClient {
 
 		Log.info("Sending request to server.");
 
+		System.out.println(uris[uris.length-1]);
 		var result = new RestMessageClient(uris[uris.length-1]).postMessage(args[0], pwd, m);
 		System.out.println("Result: " + result);
 
