@@ -27,13 +27,13 @@ public class UpdateUserClient {
 		String domain = "users." + userAndDomain[1];
 		URI[] uris = discovery.knownUrisOf(domain, 1);
 
-		var u = new User( name, pwd, userAndDomain[1], displayName);
+		var u = new User( args[0], pwd, userAndDomain[1], displayName);
 		
 		System.out.println("Sending request to server.");
 		
 		//TODO complete this client code
 
-		var result = new RestUsersClient(uris[uris.length-1]).updateUser(name, oldpwd, u);
+		var result = new RestUsersClient(uris[uris.length-1]).updateUser(args[0], oldpwd, u);
 		System.out.println("Result: " + result);
 
 		System.exit(0);

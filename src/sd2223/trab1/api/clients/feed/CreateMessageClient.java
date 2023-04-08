@@ -26,13 +26,11 @@ public class CreateMessageClient {
 		String[] userAndDomain = args[0].split("@");
 		String msg = args[1];
 		String pwd = args[2];
-
-        String user = userAndDomain[0];
 		String domain = "feeds." + userAndDomain[1];
 
 		URI[] uris = discovery.knownUrisOf(domain, 1);	
 
-        Message m = new Message(-1, user, userAndDomain[1], msg);
+        Message m = new Message(-1, args[0], userAndDomain[1], msg);
 
 		Log.info("Sending request to server.");
 

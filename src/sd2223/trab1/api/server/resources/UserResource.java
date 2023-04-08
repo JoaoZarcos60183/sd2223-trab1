@@ -15,7 +15,6 @@ public class UserResource implements UsersService { // Servidor e cliente comuni
 
 	private final Map<String,User> users = new HashMap<>();
 	private static Logger Log = Logger.getLogger(UserResource.class.getName());
-	Discovery discovery = Discovery.getInstance();
 	
 	public UserResource() {
 	}
@@ -23,7 +22,7 @@ public class UserResource implements UsersService { // Servidor e cliente comuni
 	@Override
 	public String createUser(User user) {
 		Log.info("createUser : " + user);
-		
+
 		// Check if user data is valid
 		if(user.getName() == null || user.getPwd() == null || user.getDisplayName() == null || user.getDomain() == null) {
 			Log.info("User object invalid.");
@@ -36,7 +35,8 @@ public class UserResource implements UsersService { // Servidor e cliente comuni
 			throw new WebApplicationException( Status.CONFLICT );
 		}
 
-		return user.getName();
+		System.out.println(user.getName());
+		return user.getName() + "@" + user.getDomain();
 	}
 	
 	@Override
@@ -68,7 +68,7 @@ public class UserResource implements UsersService { // Servidor e cliente comuni
 	@Override
 	public User updateUser(String userId, String password, User user) {
 		Log.info("updateUser : user = " + userId + "; pwd = " + password + " ; user = " + user);
-		// TODO Complete method
+
 		// Check if user is valid
 		if(userId == null || password == null) {
 			Log.info("UserId or password null.");
@@ -88,6 +88,20 @@ public class UserResource implements UsersService { // Servidor e cliente comuni
 			Log.info("Password is incorrect.");
 			throw new WebApplicationException( Status.FORBIDDEN );
 		}
+
+		if (!userId.equals(user.getName()))
+			throw new WebApplicationException(Status.BAD_REQUEST);
+
+
+		if (user.getDisplayName() == null)
+			user.setDisplayName(u.getDisplayName());
+
+		if (user.getDomain() == null)
+			user.setDomain(u.getDomain());
+
+		if (user.getPwd() == null)
+			user.setPwd(u.getPwd());
+
 
 		users.replace(userId, user);
 

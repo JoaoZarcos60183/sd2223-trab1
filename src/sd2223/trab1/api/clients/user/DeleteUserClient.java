@@ -17,14 +17,13 @@ public class DeleteUserClient {
 
 		String[] userAndDomain = args[0].split("@");
 		String pwd = args[1];
-		String user = userAndDomain[0];
 		String domain = "users." + userAndDomain[1];
 
 		URI[] uris = discovery.knownUrisOf(domain, 1);
 		
 		System.out.println("Sending request to server.");
 		
-		var result = new RestUsersClient(uris[uris.length-1]).deleteUser(user, pwd);
+		var result = new RestUsersClient(uris[uris.length-1]).deleteUser(args[0], pwd);
 		System.out.println("Result: " + result);
 	
 		System.exit(0);

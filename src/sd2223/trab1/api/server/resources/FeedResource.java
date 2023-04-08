@@ -41,7 +41,9 @@ public class FeedResource implements FeedsService{
         String aux = "users." + arr[1];
 		URI[] uris = discovery.knownUrisOf(aux, 1);
 
+		System.out.println(arr[0]);
         User userAux = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
+		System.out.println(uris[uris.length-1]);
 
 		// Insert user, checking if name already exists
 		if(userAux == null || !userAux.getPwd().equals(pwd)) {
@@ -169,8 +171,6 @@ public class FeedResource implements FeedsService{
 		//Fazer Remote
 		Log.info("subUser : " + user);
 
-		System.out.println("Olá");
-
 		if(user == null) {
 			Log.info("User object invalid.");
 			throw new WebApplicationException( Status.BAD_REQUEST );
@@ -179,10 +179,10 @@ public class FeedResource implements FeedsService{
 		String[] arr = userSub.split("@");
         String aux = "users." + arr[1];
 		URI[] uris = discovery.knownUrisOf(aux, 0);
-		String userSubAux = arr[0];
+		String subbed = arr[0];
 
-		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
-		User userToSub = searchUser(listUsers, arr[0]);
+		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(subbed);
+		User userToSub = searchUser(listUsers, subbed);
 
 		if(userToSub == null) {
 			Log.info("User to subscribe does not exist.");
@@ -201,10 +201,10 @@ public class FeedResource implements FeedsService{
 
 
 		if (subs.containsKey(arr[0]))
-			subs.get(arr[0]).put(userSubAux, userToSub);
+			subs.get(arr[0]).put(subbed, userToSub);
         else{
             Map<String, User> auxMap = new HashMap<>();
-            auxMap.put(userSubAux, userToSub);
+            auxMap.put(subbed, userToSub);
             subs.put(arr[0], auxMap);
         }
 
@@ -223,15 +223,16 @@ public class FeedResource implements FeedsService{
 		String[] arr = user.split("@");
         String aux = "users." + arr[1];
 		URI[] uris = discovery.knownUrisOf(aux, 0);
-		String userAux = arr[0];
+		String unsubbing = arr[0];
 
-		User userUnsubbing = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
+		User userUnsubbing = new RestUsersClient(uris[uris.length-1]).getUser(unsubbing, pwd);
 
 		arr = userSub.split("@");
         aux = "users." + arr[1];
 		uris = discovery.knownUrisOf(aux, 0);
 
-		User userToUnsub = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
+		List<User> list = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
+		User userToUnsub = searchUser(list, arr[0]);
 
 		if (userUnsubbing == null || userToUnsub == null){
 			Log.info("User is not subscribed.");
@@ -243,14 +244,18 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException(Status.FORBIDDEN);
 		}
 
-		subs.get(userAux).remove(arr[0]);
+		subs.get(unsubbing).remove(arr[0]);
 	}
 
 	@Override
 	public List<String> listSubs(String user) {
 		Log.info("ListSubs of : " + user);
 		String[] arr = user.split("@");
-		return new LinkedList<>(subs.get(arr[0]).keySet());
+
+		if (subs.containsKey(arr[0]))
+			return new LinkedList<>(subs.get(arr[0]).keySet());
+		else
+			throw new WebApplicationException(Status.NOT_FOUND);
 	}
 
     

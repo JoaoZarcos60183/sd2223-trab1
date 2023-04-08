@@ -27,12 +27,11 @@ public class CreateUserClient {
 		String[] userAndDomain = args[0].split("@");
 		String pwd = args[1];
 		String displayName = args[2];
-		String user = userAndDomain[0];
 		String domain = "users." + userAndDomain[1];
 
 		URI[] uris = discovery.knownUrisOf(domain, 1);
 
-		User u = new User(user, pwd, userAndDomain[1], displayName);
+		User u = new User(args[0], pwd, userAndDomain[1], displayName);
 
 		Log.info("Sending request to server.");
 

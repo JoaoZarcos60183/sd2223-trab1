@@ -20,11 +20,8 @@ public class SubUserClient {
         Discovery discovery = Discovery.getInstance();
 
         String[] userAndDomain = args[0].split("@");
-        String[] userSubAndDomain = args[1].split("@");
         String pwd = args[2];
 
-        String user = userAndDomain[0];
-        String userSub = userSubAndDomain[0];
         String domain = "feeds." + userAndDomain[1];
 
         URI[] uris = discovery.knownUrisOf(domain, 1);
@@ -32,7 +29,7 @@ public class SubUserClient {
         System.out.println("Sending request to server.");
 
         new RestMessageClient(uris[uris.length-1]).subUser(args[0], args[1], pwd);
-        System.out.println("Success: " + user + " subscribed " + userSub);
+        System.out.println("Success: " + args[0] + " subscribed " + args[1]);
 
         System.exit(0);
     }

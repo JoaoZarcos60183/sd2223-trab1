@@ -17,14 +17,13 @@ public class GetUserClient {
 
 		String[] userAndDomain = args[0].split("@");
 		String pwd = args[1];
-		String user = userAndDomain[0];
 		String domain = "users." + userAndDomain[1];
 
 		URI[] uris = discovery.knownUrisOf(domain, 1);
 		
 		System.out.println("Sending request to server.");
 		
-		var result = new RestUsersClient(uris[uris.length-1]).getUser(user, pwd);
+		var result = new RestUsersClient(uris[uris.length-1]).getUser(args[0], pwd);
 		System.out.println("Result: " + result);
 
 		System.exit(0);
