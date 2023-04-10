@@ -32,13 +32,15 @@ public class FeedResource implements FeedsService{
 	public long postMessage(String user, String pwd, Message msg) {
 		Log.info("postMessage : " + user);
 		
+		String[] arr = user.split("@");
+
 		// Check if user data is valid
-		if(user == null || pwd == null) {
-			Log.info("User object invalid.");
+		if(user == null || pwd == null || !arr[0].equals(msg.getUser()) || !arr[1].equals(msg.getDomain())) {
+			Log.info("Something is not right.");
 			throw new WebApplicationException( Status.BAD_REQUEST );
 		}
 
-		String[] arr = user.split("@");
+		
         String aux = "users." + arr[1];
 		URI[] uris = discovery.knownUrisOf(aux, 1);
 
@@ -124,7 +126,7 @@ public class FeedResource implements FeedsService{
 
 		Message msg = null;
 
-		if (searchUser(listUsers, arr[0]) == null || (msg = mMsg.get(mid))  == null) {
+		if (searchUser(listUsers, arr[0]) == null || mMsg == null || (msg = mMsg.get(mid))  == null) {
 
 			if(searchUser(listUsers, arr[0]) != null){
 				Map<String, User> userSubs = subs.get(arr[0]);
@@ -141,9 +143,17 @@ public class FeedResource implements FeedsService{
 						}
 					}
 			}
+
 			if (msg == null){
-				Log.info("Message or User does not exist in the server.");
-				throw new WebApplicationException(Status.NOT_FOUND);
+
+				aux = "feeds." + arr[1];
+				uris = discovery.knownUrisOf(aux, 0);
+				msg = new RestMessageClient(uris[uris.length - 1]).getMessage(user, mid);
+
+				if (msg == null){
+					Log.info("Message or User does not exist in the server.");
+					throw new WebApplicationException(Status.NOT_FOUND);
+				}
 			}
 		}
 
@@ -210,6 +220,8 @@ public class FeedResource implements FeedsService{
 				List<Message> auxList = new RestMessageClient(uris[uris.length-1]).getSelfMessages(u.getName() + "@" + u.getDomain(), time);
 				msgsToReturn.addAll(auxList);
 			}
+		
+		
 
 		return msgsToReturn;
 	}
@@ -359,6 +371,12 @@ public class FeedResource implements FeedsService{
 			}
 
 		return msgsToReturn;
+	}
+
+	@Override
+	public List<Message> getRealMessages(String user, long time) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getRealMessages'");
 	}
 
     

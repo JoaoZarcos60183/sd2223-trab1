@@ -149,4 +149,19 @@ public interface FeedsService {
 	@Path("/{" + USER +"}/self")
 	@Produces(MediaType.APPLICATION_JSON)
 	List<Message> getSelfMessages(@PathParam(USER) String user, @QueryParam(TIME) long time);
+
+
+	/**
+	 * Finds the correct place to ask for the Messages
+	 * (note: may be a remote user)
+	 *
+	 * @param user user feed being accessed (format user@domain)
+	 * @param time the oldest time of the messages to be returned
+	 * @return	200 a list of messages, potentially empty;
+	 *  		404 if the user does not exist.
+	 */
+	@GET
+	@Path("/{" + USER +"}/correct")
+	@Produces(MediaType.APPLICATION_JSON)
+	List<Message> getRealMessages(@PathParam(USER) String user, @QueryParam(TIME) long time);
 }

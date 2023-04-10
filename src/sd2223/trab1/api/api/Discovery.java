@@ -85,8 +85,12 @@ class DiscoveryImpl implements Discovery {
 	public void announce(String serviceName, String serviceURI) {
 		Log.info(String.format("Starting Discovery announcements on: %s for: %s -> %s\n", DISCOVERY_ADDR, serviceName,
 				serviceURI));
+		
+		
+		String aux[] = serviceName.split("[.]");
 
-		var pktBytes = String.format("%s%s%s", serviceName, DELIMITER, serviceURI).getBytes();
+		System.out.println(aux[1]);
+		var pktBytes = String.format("%s:%s%s%s", aux[1], aux[0], DELIMITER, serviceURI).getBytes();
 		var pkt = new DatagramPacket(pktBytes, pktBytes.length, DISCOVERY_ADDR);
 
 		// start thread to send periodic announcements
@@ -141,8 +145,8 @@ class DiscoveryImpl implements Discovery {
 
 						var parts = msg.split(DELIMITER);
 						if (parts.length == 2) {
-							// TODO: complete by storing the decoded announcements...
-							var serviceName = parts[0];
+							var domainAndService = parts[0].split(":");
+							var serviceName = domainAndService[1] + "." + domainAndService[0];
 							var uri = URI.create(parts[1]);
 							List<URI> aux = uris.get(serviceName);
 							if (aux == null){
