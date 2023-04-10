@@ -161,7 +161,7 @@ public interface FeedsService {
 	 *  		404 if the user does not exist.
 	 */
 	@GET
-	@Path("/{" + USER +"}/correct")
+	@Path("/{" + USER +"}/real")
 	@Produces(MediaType.APPLICATION_JSON)
 	List<Message> getRealMessages(@PathParam(USER) String user, @QueryParam(TIME) long time);
 }

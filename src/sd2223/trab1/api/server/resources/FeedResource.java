@@ -201,29 +201,10 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException(Status.NOT_FOUND);
 		}
 
-		Map<Long, Message> msgs = feeds.get(arr[0]);
+        aux = "feeds." + arr[1];
+		uris = discovery.knownUrisOf(aux, 0);
 
-		List<Message> msgsToReturn = new LinkedList<>();
-
-		if (msgs !=null)
-			for (Message m: msgs.values()) {
-				if (m.getCreationTime() > time)
-					msgsToReturn.add(m);
-			}
-
-		Map<String, User> userSubs = subs.get(arr[0]);
-
-		if (userSubs != null)
-			for (User u: userSubs.values()){
-				aux = "feeds." + u.getDomain();
-				uris = discovery.knownUrisOf(aux, 1);
-				List<Message> auxList = new RestMessageClient(uris[uris.length-1]).getSelfMessages(u.getName() + "@" + u.getDomain(), time);
-				msgsToReturn.addAll(auxList);
-			}
-		
-		
-
-		return msgsToReturn;
+		return new RestMessageClient(uris[uris.length - 1]).getRealMessages(user, time);
 	}
 
 	@Override
@@ -375,8 +356,30 @@ public class FeedResource implements FeedsService{
 
 	@Override
 	public List<Message> getRealMessages(String user, long time) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getRealMessages'");
+
+		String[] arr = user.split("@");
+
+		Map<Long, Message> msgs = feeds.get(arr[0]);
+
+		List<Message> msgsToReturn = new LinkedList<>();
+
+		if (msgs !=null)
+			for (Message m: msgs.values()) {
+				if (m.getCreationTime() > time)
+					msgsToReturn.add(m);
+			}
+
+		Map<String, User> userSubs = subs.get(arr[0]);
+
+		if (userSubs != null)
+			for (User u: userSubs.values()){
+				String aux = "feeds." + u.getDomain();
+				URI[] uris = discovery.knownUrisOf(aux, 1);
+				List<Message> auxList = new RestMessageClient(uris[uris.length-1]).getSelfMessages(u.getName() + "@" + u.getDomain(), time);
+				msgsToReturn.addAll(auxList);
+			}
+
+			return msgsToReturn;
 	}
 
     
