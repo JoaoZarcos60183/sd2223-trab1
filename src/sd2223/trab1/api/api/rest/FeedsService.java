@@ -135,4 +135,18 @@ public interface FeedsService {
 	@Path("/sub/list/{" + USER + "}")
 	@Produces(MediaType.APPLICATION_JSON)
 	List<String> listSubs(@PathParam(USER) String user);
+
+	/**
+	 * Returns a list of all self messages stored in the server for a given user newer than time
+	 * (note: may be a remote user)
+	 *
+	 * @param user user feed being accessed (format user@domain)
+	 * @param time the oldest time of the messages to be returned
+	 * @return	200 a list of messages, potentially empty;
+	 *  		404 if the user does not exist.
+	 */
+	@GET
+	@Path("/{" + USER +"}/self")
+	@Produces(MediaType.APPLICATION_JSON)
+	List<Message> getSelfMessages(@PathParam(USER) String user, @QueryParam(TIME) long time);
 }

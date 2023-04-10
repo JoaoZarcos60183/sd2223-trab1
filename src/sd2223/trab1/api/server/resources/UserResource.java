@@ -3,7 +3,6 @@ package sd2223.trab1.api.server.resources;
 import java.util.*;
 import java.util.logging.Logger;
 
-import sd2223.trab1.api.api.Discovery;
 import sd2223.trab1.api.api.User;
 import sd2223.trab1.api.api.rest.UsersService;
 import jakarta.inject.Singleton;

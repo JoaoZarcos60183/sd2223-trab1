@@ -11,6 +11,7 @@ import sd2223.trab1.api.api.Discovery;
 import sd2223.trab1.api.api.Message;
 import sd2223.trab1.api.api.User;
 import sd2223.trab1.api.api.rest.FeedsService;
+import sd2223.trab1.api.clients.feed.RestMessageClient;
 import sd2223.trab1.api.clients.user.RestUsersClient;
 
 @Singleton
@@ -41,13 +42,18 @@ public class FeedResource implements FeedsService{
         String aux = "users." + arr[1];
 		URI[] uris = discovery.knownUrisOf(aux, 1);
 
-		System.out.println(arr[0]);
-        User userAux = new RestUsersClient(uris[uris.length-1]).getUser(arr[0], pwd);
-		System.out.println(uris[uris.length-1]);
+		List<User> list = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
+
+        User userAux = searchUser(list, arr[0]);
 
 		// Insert user, checking if name already exists
-		if(userAux == null || !userAux.getPwd().equals(pwd)) {
-			Log.info("Invalid credentials.");
+		if(userAux == null) {
+			Log.info("User does not exist in current domain.");
+			throw new WebApplicationException( Status.NOT_FOUND );
+		}
+
+		if (!userAux.getPwd().equals(pwd)){
+			Log.info("Wrong Passsword.");
 			throw new WebApplicationException( Status.FORBIDDEN );
 		}
 
@@ -61,6 +67,7 @@ public class FeedResource implements FeedsService{
             feeds.put(arr[0], auxMap);
         }
 
+		System.out.println(msg.getId());
 		return msg.getId();
 	}
 
@@ -113,11 +120,31 @@ public class FeedResource implements FeedsService{
 
         List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
 
-		Message msg = feeds.get(arr[0]).get(mid);
+		Map<Long, Message> mMsg = feeds.get(arr[0]);
 
-		if (searchUser(listUsers, arr[0]) == null || msg  == null) {
-			Log.info("Message or User does not exist in the server.");
-			throw new WebApplicationException(Status.NOT_FOUND);
+		Message msg = null;
+
+		if (searchUser(listUsers, arr[0]) == null || (msg = mMsg.get(mid))  == null) {
+
+			if(searchUser(listUsers, arr[0]) != null){
+				Map<String, User> userSubs = subs.get(arr[0]);
+
+				if (userSubs != null)
+					for (User u: userSubs.values()){
+						System.out.println(u.getName());
+						aux = "feeds." + u.getDomain();
+						uris = discovery.knownUrisOf(aux, 1);
+						List<Message> auxList = new RestMessageClient(uris[uris.length-1]).getSelfMessages(u.getName() + "@" + u.getDomain(), 0);
+						msg = searchMessage(auxList, mid);
+						if (msg != null){
+							break;
+						}
+					}
+			}
+			if (msg == null){
+				Log.info("Message or User does not exist in the server.");
+				throw new WebApplicationException(Status.NOT_FOUND);
+			}
 		}
 
 		return msg;
@@ -127,6 +154,16 @@ public class FeedResource implements FeedsService{
 		for (User u: listUsers)
 			if (u.getName().equals(user))
 				return u;
+
+		return null;
+	}
+
+	private Message searchMessage(List<Message> listMessages, long id) {
+		for (Message m: listMessages){
+			System.out.println(m.getId());
+			if (m.getId() == id)
+				return m;
+	}
 
 		return null;
 	}
@@ -158,10 +195,21 @@ public class FeedResource implements FeedsService{
 
 		List<Message> msgsToReturn = new LinkedList<>();
 
-		for (Message m: msgs.values()) {
-			if (m.getCreationTime() >= time)
-				msgsToReturn.add(m);
-		}
+		if (msgs !=null)
+			for (Message m: msgs.values()) {
+				if (m.getCreationTime() > time)
+					msgsToReturn.add(m);
+			}
+
+		Map<String, User> userSubs = subs.get(arr[0]);
+
+		if (userSubs != null)
+			for (User u: userSubs.values()){
+				aux = "feeds." + u.getDomain();
+				uris = discovery.knownUrisOf(aux, 1);
+				List<Message> auxList = new RestMessageClient(uris[uris.length-1]).getSelfMessages(u.getName() + "@" + u.getDomain(), time);
+				msgsToReturn.addAll(auxList);
+			}
 
 		return msgsToReturn;
 	}
@@ -170,7 +218,7 @@ public class FeedResource implements FeedsService{
 	public void subUser(String user, String userSub, String pwd) {
 		//Fazer Remote
 		Log.info("subUser : " + user);
-
+		
 		if(user == null) {
 			Log.info("User object invalid.");
 			throw new WebApplicationException( Status.BAD_REQUEST );
@@ -251,11 +299,66 @@ public class FeedResource implements FeedsService{
 	public List<String> listSubs(String user) {
 		Log.info("ListSubs of : " + user);
 		String[] arr = user.split("@");
+		String aux = "users." + arr[1];
+		URI[] uris = discovery.knownUrisOf(aux, 0);
 
-		if (subs.containsKey(arr[0]))
-			return new LinkedList<>(subs.get(arr[0]).keySet());
+		List<User> list = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
+
+        User userAux = searchUser(list, arr[0]);
+
+		// Insert user, checking if name already exists
+		if(userAux == null) {
+			Log.info("User does not exist in current domain.");
+			throw new WebApplicationException( Status.NOT_FOUND );
+		}
+
+		Map<String, User> auxMap = subs.get(arr[0]);
+
+		if (auxMap != null){
+			List<String> auxList = new LinkedList<>();
+			for (User u: auxMap.values())
+				auxList.add(u.getName() + "@" + u.getDomain());
+			
+			return auxList;
+		}
+			
 		else
+			//throw new WebApplicationException(Status.NOT_FOUND);
+		return new LinkedList<>();
+		}
+
+	@Override
+	public List<Message> getSelfMessages(String user, long time) {
+		Log.info("getMessages : " + user);
+
+		// Check if user data is valid
+		if(user == null) {
+			Log.info("User object invalid.");
+			throw new WebApplicationException( Status.BAD_REQUEST );
+		}
+
+		String[] arr = user.split("@");
+        String aux = "users." + arr[1];
+		URI[] uris = discovery.knownUrisOf(aux, 0);
+
+		List<User> listUsers = new RestUsersClient(uris[uris.length-1]).searchUsers(arr[0]);
+
+		if (searchUser(listUsers, arr[0]) == null) {
+			Log.info("User does not exist.");
 			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+
+		Map<Long, Message> msgs = feeds.get(arr[0]);
+
+		List<Message> msgsToReturn = new LinkedList<>();
+
+		if (msgs != null)
+			for (Message m: msgs.values()) {
+				if (m.getCreationTime() > time)
+					msgsToReturn.add(m);
+			}
+
+		return msgsToReturn;
 	}
 
     

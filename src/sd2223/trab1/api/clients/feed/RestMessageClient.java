@@ -19,7 +19,7 @@ public class RestMessageClient extends RestClient implements FeedsService {
 
 	final WebTarget target;
 	
-	RestMessageClient( URI serverURI ) {
+	public RestMessageClient( URI serverURI ) {
 		super( serverURI );
 		target = client.target( serverURI ).path( FeedsService.PATH );
 	}
@@ -143,6 +143,22 @@ public class RestMessageClient extends RestClient implements FeedsService {
         return new LinkedList<>();
     }
 
+    private List<Message> clt_getSelfMessages(String user, long time) {
+        Response r = target.path( user + "/self" )
+                    .queryParam(FeedsService.TIME, time).request()
+                    .accept(MediaType.APPLICATION_JSON)
+                    .get();
+        
+        if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
+            System.out.println("Messages Obtained."); 
+            return r.readEntity(new GenericType<List<Message>>() {});
+        }
+        else if (r.getStatus() == Status.NOT_FOUND.getStatusCode())
+            System.out.println("Error, HTTP error status: " + r.getStatus() );
+
+        return new LinkedList<>();
+    }
+
     @Override
     public long postMessage(String user, String pwd, Message msg) {
         return super.reTry(() -> clt_createMessage(user, pwd, msg));
@@ -176,5 +192,10 @@ public class RestMessageClient extends RestClient implements FeedsService {
     @Override
     public List<String> listSubs(String user) {
         return super.reTry(() -> clt_listSubs(user));
+    }
+
+    @Override
+    public List<Message> getSelfMessages(String user, long time) {
+        return clt_getSelfMessages(user, time);
     }
 }

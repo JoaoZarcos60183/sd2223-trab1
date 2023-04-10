@@ -23,7 +23,6 @@ public class UpdateUserClient {
 		String pwd = args[2];
 		String displayName = args[3];
 
-		String name = userAndDomain[0];
 		String domain = "users." + userAndDomain[1];
 		URI[] uris = discovery.knownUrisOf(domain, 1);
 

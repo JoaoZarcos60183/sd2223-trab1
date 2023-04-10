@@ -25,7 +25,7 @@ public class FeedsServer {
 
         try {
 
-            if (args.length != 1) {
+            if (args.length != 2) {
                 System.err.println("Use: domain");
                 System.exit(0);
                 return;

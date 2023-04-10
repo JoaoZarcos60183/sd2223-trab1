@@ -38,8 +38,8 @@ public class UsersServer {
 			disc.announce(service, uri); //Com dois servidores, anunciar repetido? e Qual Ã© o servidor que o Cliente vai buscar? Cada um vai ter nome diferente?
 
 			ResourceConfig config = new ResourceConfig();
+			
 			config.register(UserResource.class);
-			// config.register(CustomLoggingFilter.class);
 
 			String ip = InetAddress.getLocalHost().getHostAddress();
 			String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
