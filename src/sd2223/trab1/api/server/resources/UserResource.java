@@ -1,12 +1,15 @@
 package sd2223.trab1.api.server.resources;
 
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
+import sd2223.trab1.api.api.Discovery;
 import sd2223.trab1.api.api.User;
 import sd2223.trab1.api.api.rest.UsersService;
+import sd2223.trab1.api.clients.feed.RestMessageClient;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
@@ -135,6 +138,11 @@ public class UserResource implements UsersService { // Servidor e cliente comuni
 		}
 
 		users.remove(userId);
+
+		Discovery discovery = Discovery.getInstance();
+		String aux = "feeds." + user.getDomain();
+		URI[] uris = discovery.knownUrisOf(aux, 0);
+		new RestMessageClient(uris[uris.length-1]).deleteInfo(userId + "@" + user.getDomain());
 
 		return user;
 	}

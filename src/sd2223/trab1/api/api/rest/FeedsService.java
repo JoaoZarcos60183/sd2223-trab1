@@ -178,4 +178,14 @@ public interface FeedsService {
 	@Path("/{" + USER + "}/{" + MID + "}/real")
 	@Produces(MediaType.APPLICATION_JSON)
 	Message getRealMessage(@PathParam(USER) String user, @PathParam(MID) long mid);
+
+	/**
+	 * Removes the info of the user from the feeds server
+	 *
+	 * @param user user feed being accessed (format user@domain)
+	 * 
+	 */
+	@DELETE
+	@Path("/{" + USER + "}/info")
+	void deleteInfo(@PathParam(USER) String user);
 }

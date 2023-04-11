@@ -297,9 +297,15 @@ public class FeedResource implements FeedsService{
 
 		if (auxMap != null){
 			List<String> auxList = new LinkedList<>();
-			for (User u: auxMap.values())
-				auxList.add(u.getName() + "@" + u.getDomain());
-
+			for (User u: auxMap.values()){
+				uris = discovery.knownUrisOf("users." + u.getDomain(), 0);
+				List<User> userL = new RestUsersClient(uris[uris.length - 1]).searchUsers(u.getName());
+				if (searchUser(userL, u.getName()) != null)
+					auxList.add(u.getName() + "@" + u.getDomain());
+				else { 
+					subs.get(arr[0]).remove(u.getName());
+				}
+			}
 			return auxList;
 		}
 		else
@@ -399,6 +405,17 @@ public class FeedResource implements FeedsService{
 		}
 
 		return msg;
+	}
+
+	@Override
+	public void deleteInfo(String user) {
+		
+		String[] arr = user.split("@");
+
+		feeds.remove(arr[0]);
+		subs.remove(arr[0]);
+
+
 	}
 
 

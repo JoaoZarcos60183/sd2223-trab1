@@ -191,6 +191,17 @@ public class RestMessageClient extends RestClient implements FeedsService {
         return null;
     }
 
+    private int clt_deleteInfo(String user) {
+        Response r = target.path( user + "/info" ).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
+
+        if( r.getStatus() == Status.NO_CONTENT.getStatusCode())
+            System.out.println("Deleted Info.");
+
+        return 0;
+    }
+
 
     @Override
     public long postMessage(String user, String pwd, Message msg) {
@@ -240,5 +251,10 @@ public class RestMessageClient extends RestClient implements FeedsService {
     @Override
     public Message getRealMessage(String user, long mid) {
         return super.reTry(() -> clt_getRealMessage(user, mid));
+    }
+
+    @Override
+    public void deleteInfo(String user) {
+        super.reTry(() -> clt_deleteInfo(user));
     }
 }
