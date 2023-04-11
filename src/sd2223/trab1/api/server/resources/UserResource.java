@@ -1,6 +1,8 @@
 package sd2223.trab1.api.server.resources;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 import sd2223.trab1.api.api.User;
@@ -12,7 +14,7 @@ import jakarta.ws.rs.core.Response.Status;
 @Singleton
 public class UserResource implements UsersService { // Servidor e cliente comunicam através das interfaces
 
-	private final Map<String,User> users = new HashMap<>();
+	private final ConcurrentMap<String,User> users = new ConcurrentHashMap<>();
 	private static Logger Log = Logger.getLogger(UserResource.class.getName());
 	
 	public UserResource() {
