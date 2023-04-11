@@ -2,6 +2,8 @@ package sd2223.trab1.api.server.resources;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 import jakarta.inject.Singleton;
@@ -17,8 +19,8 @@ import sd2223.trab1.api.clients.user.RestUsersClient;
 @Singleton
 public class FeedResource implements FeedsService{
 
-	private Map<String, Map<Long,Message>> feeds = new HashMap<>();
-	private Map<String, Map<String, User>> subs = new HashMap<>();
+	private ConcurrentMap<String, ConcurrentMap<Long,Message>> feeds = new ConcurrentHashMap<>();
+	private ConcurrentMap<String, ConcurrentMap<String, User>> subs = new ConcurrentHashMap<>();
 	private static Logger Log = Logger.getLogger(UserResource.class.getName());
 	private Discovery discovery = Discovery.getInstance();
 	private long number, counter;
@@ -69,7 +71,7 @@ public class FeedResource implements FeedsService{
 		if (feeds.containsKey(userAux.getName()))
 			feeds.get(arr[0]).put(msg.getId(), msg);
 		else{
-			Map<Long, Message> auxMap = new HashMap<>();
+			ConcurrentMap<Long, Message> auxMap = new ConcurrentHashMap<>();
 			auxMap.put(msg.getId(), msg);
 			feeds.put(arr[0], auxMap);
 		}
@@ -100,14 +102,14 @@ public class FeedResource implements FeedsService{
 			throw new WebApplicationException( Status.FORBIDDEN );
 		}
 
-		Message msg = feeds.get(arr[0]).get(mid);
+		Map<Long, Message> m = feeds.get(arr[0]);
 
-		if (msg == null) {
+		if (m == null || m.get(mid) == null) {
 			Log.info("Message does not exist in the server.");
 			throw new WebApplicationException(Status.NOT_FOUND);
 		}
 
-		feeds.get(arr[0]).remove(mid);
+		m.remove(mid);
 
 	}
 
@@ -163,8 +165,6 @@ public class FeedResource implements FeedsService{
 
 		return null;
 	}
-
-
 
 	@Override
 	public List<Message> getMessages(String user, long time) {
@@ -232,7 +232,7 @@ public class FeedResource implements FeedsService{
 		if (subs.containsKey(arr[0]))
 			subs.get(arr[0]).put(subbed, userToSub);
 		else{
-			Map<String, User> auxMap = new HashMap<>();
+			ConcurrentMap<String, User> auxMap = new ConcurrentHashMap<>();
 			auxMap.put(subbed, userToSub);
 			subs.put(arr[0], auxMap);
 		}
@@ -302,9 +302,7 @@ public class FeedResource implements FeedsService{
 
 			return auxList;
 		}
-
 		else
-			//throw new WebApplicationException(Status.NOT_FOUND);
 			return new LinkedList<>();
 	}
 
@@ -380,8 +378,6 @@ public class FeedResource implements FeedsService{
 		Message msg = null;
 
 		if (mMsg == null || (msg = mMsg.get(mid)) == null) {
-
-			//if(searchUser(listUsers, arr[0]) != null){
 			Map<String, User> userSubs = subs.get(arr[0]);
 
 			if (userSubs != null)
@@ -395,14 +391,12 @@ public class FeedResource implements FeedsService{
 						break;
 					}
 				}
-			//}
 
 			if (msg == null){
 				Log.info("Message or User does not exist in the server.");
 				throw new WebApplicationException(Status.NOT_FOUND);
 			}
 		}
-
 
 		return msg;
 	}
