@@ -39,7 +39,7 @@ public class FeedsServer {
             ResourceConfig config = new ResourceConfig();
 
             config.register(FeedResource.class);
-            
+
             String ip = InetAddress.getLocalHost().getHostAddress();
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
             JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config);

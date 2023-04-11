@@ -164,4 +164,18 @@ public interface FeedsService {
 	@Path("/{" + USER +"}/real")
 	@Produces(MediaType.APPLICATION_JSON)
 	List<Message> getRealMessages(@PathParam(USER) String user, @QueryParam(TIME) long time);
+
+	/**
+	 * Obtains the message with id from the feed of user in the right domain
+	 *
+	 * @param user user feed being accessed (format user@domain)
+	 * @param mid id of the message
+	 *
+	 * @return	200 the message if it exists;
+	 *			404 if the user or the message does not exists
+	 */
+	@GET
+	@Path("/{" + USER + "}/{" + MID + "}/real")
+	@Produces(MediaType.APPLICATION_JSON)
+	Message getRealMessage(@PathParam(USER) String user, @PathParam(MID) long mid);
 }

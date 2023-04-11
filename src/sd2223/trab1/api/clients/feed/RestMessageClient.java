@@ -17,38 +17,38 @@ import sd2223.trab1.api.api.User;
 
 public class RestMessageClient extends RestClient implements FeedsService {
 
-	final WebTarget target;
-	
-	public RestMessageClient( URI serverURI ) {
-		super( serverURI );
-		target = client.target( serverURI ).path( FeedsService.PATH );
-	}
+    final WebTarget target;
+
+    public RestMessageClient( URI serverURI ) {
+        super( serverURI );
+        target = client.target( serverURI ).path( FeedsService.PATH );
+    }
 
     private long clt_createMessage(String user, String pwd, Message message) {
-		Response r = target.path( user )
+        Response r = target.path( user )
                 .queryParam(FeedsService.PWD, pwd).request()
-				.post(Entity.entity(message, MediaType.APPLICATION_JSON));
+                .post(Entity.entity(message, MediaType.APPLICATION_JSON));
 
-		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() )
-			return r.readEntity(Long.class);
-		else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
-			System.out.println("Error, HTTP error status: " + r.getStatus() );
-        else 
+        if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() )
+            return r.readEntity(Long.class);
+        else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
+            System.out.println("Error, HTTP error status: " + r.getStatus() );
+        else
             System.out.println("Error, HTTP error status: " + Status.BAD_REQUEST);
-		
-		return -1;
-	}
+
+        return -1;
+    }
 
     private int clt_removeFromPersonalFeed(String user, long mid, String pwd) {
         Response r = target.path( user ).path(String.valueOf(mid))
                 .queryParam(FeedsService.PWD, pwd).request()
-				.delete();
-        
+                .delete();
+
         if( r.getStatus() == Status.NO_CONTENT.getStatusCode())
             System.out.println("Deleted Post.");
         else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus() );
-        else 
+        else
             System.out.println("Error, HTTP error status: " + Status.NOT_FOUND);
 
         return 0;
@@ -56,16 +56,15 @@ public class RestMessageClient extends RestClient implements FeedsService {
 
     private Message clt_getMessage(String user, long mid) {
         Response r = target.path( user + "/" + mid ).request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .get();
-        
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
+        System.out.println(r.hasEntity());
         if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
-            System.out.println("Message Obtained."); 
+            System.out.println("Message Obtained.");
             return r.readEntity(Message.class);
         }
-        else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
-            System.out.println("Error, HTTP error status: " + r.getStatus() );
-        else 
+        else
             System.out.println("Error, HTTP error status: " + Status.NOT_FOUND);
 
         return null;
@@ -73,12 +72,12 @@ public class RestMessageClient extends RestClient implements FeedsService {
 
     private List<Message> clt_getMessages(String user, long time) {
         Response r = target.path( user )
-                    .queryParam(FeedsService.TIME, time).request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .get();
-        
+                .queryParam(FeedsService.TIME, time).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
         if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
-            System.out.println("Messages Obtained."); 
+            System.out.println("Messages Obtained.");
             return r.readEntity(new GenericType<List<Message>>() {});
         }
         else if (r.getStatus() == Status.NOT_FOUND.getStatusCode())
@@ -89,10 +88,10 @@ public class RestMessageClient extends RestClient implements FeedsService {
 
     private int clt_subUser(String user, String userSub, String pwd) {
         Response r = target.path( "/sub/" + user + "/" + userSub )
-                    .queryParam(FeedsService.PWD, pwd).request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .post(Entity.entity(User.class, MediaType.APPLICATION_JSON));
-        
+                .queryParam(FeedsService.PWD, pwd).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(User.class, MediaType.APPLICATION_JSON));
+
         if( r.getStatus() == Status.NO_CONTENT.getStatusCode()){
             System.out.println("User was subed");
         }
@@ -100,18 +99,18 @@ public class RestMessageClient extends RestClient implements FeedsService {
             System.out.println("Error, HTTP error status: " + r.getStatus() );
         else if (r.getStatus() == Status.FORBIDDEN.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus());
-        
-            System.out.println(r.getStatus());
+
+        System.out.println(r.getStatus());
 
         return 0;
     }
 
     private int clt_unsubUser(String user, String userSub, String pwd) {
         Response r = target.path( "/sub/" + user + "/" + userSub )
-                    .queryParam(FeedsService.PWD, pwd).request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .delete();
-        
+                .queryParam(FeedsService.PWD, pwd).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
+
         if( r.getStatus() == Status.NO_CONTENT.getStatusCode()){
             System.out.println("User was unsubed");
         }
@@ -127,10 +126,10 @@ public class RestMessageClient extends RestClient implements FeedsService {
 
     private List<String> clt_listSubs(String user) {
         Response r = target.path("/sub/list/" + user)
-                    .request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .get();
-        
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
         if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
             System.out.println("The list:");
             return r.readEntity(new GenericType<List<String>>() {});
@@ -139,18 +138,18 @@ public class RestMessageClient extends RestClient implements FeedsService {
             System.out.println("Error, HTTP error status: " + r.getStatus() );
 
         System.out.println(r.getStatus());
-        
+
         return new LinkedList<>();
     }
 
     private List<Message> clt_getSelfMessages(String user, long time) {
         Response r = target.path( user + "/self" )
-                    .queryParam(FeedsService.TIME, time).request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .get();
-        
+                .queryParam(FeedsService.TIME, time).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
         if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
-            System.out.println("Messages Obtained."); 
+            System.out.println("Messages Obtained.");
             return r.readEntity(new GenericType<List<Message>>() {});
         }
         else if (r.getStatus() == Status.NOT_FOUND.getStatusCode())
@@ -161,18 +160,35 @@ public class RestMessageClient extends RestClient implements FeedsService {
 
     private List<Message> clt_getRealMessages(String user, long time) {
         Response r = target.path( user + "/real" )
-                    .queryParam(FeedsService.TIME, time).request()
-                    .accept(MediaType.APPLICATION_JSON)
-                    .get();
-        
+                .queryParam(FeedsService.TIME, time).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
         if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
-            System.out.println("Messages Obtained."); 
+            System.out.println("Messages Obtained.");
             return r.readEntity(new GenericType<List<Message>>() {});
         }
         else if (r.getStatus() == Status.NOT_FOUND.getStatusCode())
             System.out.println("Error, HTTP error status: " + r.getStatus() );
 
         return new LinkedList<>();
+    }
+
+    private Message clt_getRealMessage(String user, long mid) {
+        Response r = target.path( user + "/" + mid + "/real").request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
+        System.out.println(r.getStatus());
+
+        if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
+            System.out.println("Message Obtained.");
+            return r.readEntity(Message.class);
+        }
+        else
+            System.out.println("Error, HTTP error status: " + Status.NOT_FOUND);
+
+        return null;
     }
 
 
@@ -219,5 +235,10 @@ public class RestMessageClient extends RestClient implements FeedsService {
     @Override
     public List<Message> getRealMessages(String user, long time) {
         return super.reTry(() -> clt_getRealMessages(user, time));
+    }
+
+    @Override
+    public Message getRealMessage(String user, long mid) {
+        return super.reTry(() -> clt_getRealMessage(user, mid));
     }
 }
